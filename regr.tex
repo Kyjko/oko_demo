@@ -35,6 +35,8 @@
 \begin{document}
 	\maketitle
 	\tableofcontents
+	\vspace{2cm}
+	\emph{A *-al jelölt fejezetek/alfejezetek tudtommal nem képezik részét az anyagnak, azonban (szerintem) érdekesek, és segíthetnek jobban megérteni a lineáris regressziót.}
 	\newpage
 	\section{Matematikai összefoglaló}
 	A lineáris regresszió megértéséhez elengedhetetlen, hogy tisztában legyünk néhány, lineáris algebrából ismeretes fogalommal és összefüggéssel. Ezen felül nagyon hasznos, ha ismerjük, hogy hogyan kezelendőek a valószínűségi vektorváltozók illetve a mártixdifferenciálás-kifejezések.  
@@ -184,7 +186,7 @@
 	\[
 		\hat{\pmb{y}} = \pmb{X}\ebeta 
 	\]
-	úgynevezett \emph{predikciós} egyenletből származott \emph{becsült} $\hat{\pmb{y}}$ vektor a lehető legközelebb legyen a valódi megfigyelt $\pmb{y}$ vektorhoz.
+	úgynevezett \emph{predikciós} egyenletből származott \emph{becsült} $\hat{\pmb{y}}$ vektor a lehető legközelebb legyen a valódi megfigyelt $\pmb{y}$ vektorhoz. Persze megfigyeletlen $\pmb{x}$ magyarázó változók esetén a predikciós egyenlet szintén működik, és valójában ez is a célja a regressziónak.
 	\\
 	\\
 	A lineáris regresszió egy darab regresszor (magyarázó változó) esetén az alábbi ábrával szemléltethető:
@@ -794,6 +796,37 @@
 	\]
 	ahol látható, hogy a jobb oldal második tagja pontosan a kihagyott $z$ változó miatti torzítás, avagy \emph{bias}.
 	
+	\section{*MSE és a bias-variancia tradeoff}
+	Tekintsünk egy általános
+	\[
+		\pmb{y} = \textswab{Q}(\pmb{X}) + \pmb{\e}
+	\]
+	modellt. Csakúgy, mint eddig, $\pmb{X}$ a regresszorok, $\pmb{y}$ a magyarázott változó vektora, $\textswab{Q}$ pedig valamilyen függvény. Az $\pmb{\e}$ hibák regresszorok szerinti feltételes várható értéke $0$. Figyeljük meg, hogy a lineáris regresszió esetében $\textswab{Q}$ a lineáris $\pmb{\beta}$ együtthatóvektor. A célunk, hogy megtaláljuk azt a $\widehat{\textswab{Q}}$ függvényt, amivel a becsült
+	\[
+		\hat{\pmb{y}} = \widehat{\textswab{Q}}(\pmb{X})
+	\]
+	
+	A $\hat{\pmb{y}}$-ok és a tényleges $\pmb{y}$-ok négyzetes távolsága a lehető legkisebb. Nyilvánvalóan - ezt a regressziónál is láttuk már - egy olyan $\widehat{\textswab{Q}}$-t találni, ami \emph{tökéletesen} becsüli $\pmb{y}$-t reális esetben lehetetlen, így fontos lesz, hogy valahogyan számszerűsíthessük a még megfigyeletlen regresszorokon vett várható tévedésünket.
+	\\
+	\\
+	A \emph{várható négyzetes tévedés mértéke} egy valamilyen \emph{megfigyeletlen} $\pmb{x}$ magyarázó változó-vektoron, más néven a \emph{Mean Squared Error} ($MSE$):
+	\[
+		MSE = \mathbb{E}[(\pmb{y} - \widehat{\textswab{Q}}(\pmb{x}))^2]
+	\]
+	felbontható \emph{bias}, \emph{variancia} illetve magyarázatlan hiba $\sigma^2$ részekre:
+	\[
+		MSE = \mathbb{E}[(\pmb{y} - \widehat{\textswab{Q}}(\pmb{x}))^2] = (Bias[\widehat{\textswab{Q}}(\pmb{x})])^2 + Var[\widehat{\textswab{Q}}(\pmb{x})] + \sigma^2
+	\]
+	ahol persze a $\mathbb{E}$ várható érték operátor a sokaságból választott véletlenszerű megfigyeletlen $\pmb{x}$-en fut végig, és ahol
+	\[
+		Bias[\widehat{\textswab{Q}}(\pmb{x})] = \mathbb{E}[\widehat{\textswab{Q}}(\pmb{x}) - \textswab{Q}(\pmb{x})] = \mathbb{E}[\widehat{\textswab{Q}}(\pmb{x})] - \mathbb{E}[y(\pmb{x})]
+	\]
+	a várható eltérés a tényleges $\pmb{y}$-októl, illetve
+	\[
+		Var[\widehat{\textswab{Q}}(\pmb{x})] = \mathbb{E}[(\mathbb{E}[\widehat{\textswab{Q}}(\pmb{x})] - \widehat{\textswab{Q}}(\pmb{x}))^2]
+	\]
+	a modellfüggvény becslésének \emph{bizonytalansága}. Minél komplexebb $\widehat{\textswab{Q}}$, annál jobban csökken a bias, azonban egyidejűleg nő a variancia. Minél egyszerűbb $\widehat{\textswab{Q}}$, annál nagyobb a bias, viszont a variancia kicsi lesz. 
+	
 	\section{A heteroszkedaszticitás kezelése, a GLS eljárás}
 	A Gauss-Markov feltevések egyike volt, hogy$\pmb{\Sigma}$ hiba variancia-kovariancia mátrix diagonális, és a diagonális elemek azonosan $\sigma^2$-ek. Láttuk azt is, hogy ezekre a $\sigma^2$-ekre torzítatlan becslést ad a $\widehat{\sigma^2}$ \emph{hibavariancia becslés}. Azt az esetet, amikor $\pmb{\Sigma}$ diagonális, azonban $\sigma^2$-ek nem egyenlőek, heteroszkedaszticitásnak hívjuk, és emellett a hiba variancia-kovariancia mátrix mellett a paraméterbecslés varianciája már nem a megszokott
 	\[
@@ -840,7 +873,6 @@
 		\ebeta_{GLS} = (\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{X})^{-1}\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{y}
 	\]
 	Ez már konzisztens a Gauss-Markov feltételekkel, így $\ebeta$ paraméterbecslés teljesíti a BLUE kritériumokat. Ez az eljárás egy speciális esete a \emph{Generalized Least Squares (GLS)} becslési eljárásnak, ahol $\pmb{\Sigma}$ nemdiagonális elemei mind $0$-k, az angol irodalomban \emph{Weighted Least Squares} néven szerepel. Ha $\pmb{\Sigma}$ nem is diagonális (azaz autokorreláció van a hibák között), akkor is elvégezhető a GLS eljárás. $\pmb{\Sigma}^{-1}$-t, azaz az inverz variancia-kovariancia mátrixot \emph{precíziós mátrixnak} is hívják.
-	
 	\subsection{*A GLS becslés analitikus levezetése}
 	$\ebeta_{GLS}$ alakját megkaphatjuk úgy is, ha tekintjük az alábbi optimalizációs problémát:
 	\[
@@ -855,7 +887,6 @@
 		\ebeta_{GLS} = (\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{X})^{-1}\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{y}
 	\]
 	Így is megkaptuk ugyanazt az alakot.
-	
 	\subsection{A Feasible Generalized Least Squares (FGLS) eljárás}
 	Ha nem ismerjük a valódi $\pmb{\Sigma}$ hibavariancia-kovariancia mátrixot, akkor a már bevezetett $\widehat{\sigma^2}$ becsült varianciákkal konstruálhatjuk meg a becsült $\widehat{\pmb{\Sigma}}$ mátrixot. Ezzel a becsült hibavariancia-kovariancia mátrixxal a paraméterbecslés alakja
 	\[
