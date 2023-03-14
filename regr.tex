@@ -136,6 +136,18 @@
 	\[
 	\frac{\partial 2\pmb{\beta}^T\pmb{A}^T\pmb{y}}{\partial\pmb{\beta}} = \frac{\partial 2\pmb{\beta}^T(\pmb{A}^T\pmb{y})}{\partial\pmb{\beta}} = 2\pmb{A}^T\pmb{y}
 	\]
+	\subsection{*Pont és eloszlás Mahalanobis távolsága}
+	Ez a rész csak érdekességként szerepel a PDF-ben, a Generalized Least Squares paraméterbecslés analitikus levezetésének bemutatásában használjuk csak, akinek nincs ideje átolvasni ezt a részt, nyugodtan ugorja át.
+	\\
+	\\
+	Legyen $F$ egy $\mathbb{R}^{n}$-en értelmezett eloszlás $\pmb{\mu} = [\mu_1, \mu_2, \dots, \mu_n]^T$ várható értékekkel és egy pozitív definit $\pmb{\Sigma}$ variancia-kovariancia mátrixxal. Egy $\pmb{x} = [x_1, x_2, \dots, x_n]^T$ pont Mahalanobis távolsága $F$-től
+	\[
+		d_M(\pmb{x}, F) := \sqrt{(\pmb{x} - \pmb{\mu})^T\pmb{\Sigma}^{-1}(\pmb{x} - \pmb{\mu})}
+	\]
+	Kettő $\pmb{x}, \pmb{y} \in \mathbb{R}^n$ pont $F$ szerinti Mahalanobis távolsága:
+	\[
+		d_M(\pmb{x}, \pmb{y}; F) := \sqrt{(\pmb{x} - \pmb{y})^T\pmb{\Sigma}^{-1}(\pmb{x} - \pmb{y})}
+	\]
 	
 	\section{A lineáris regresszió}
 	A regresszió kiindulópontja egy $\mathscr{X}$ normális eloszlású sokaság, melynek minden tagja rendelkezik $\pmb{x}_i$ \emph{featurevektor}-ral, avagy magyarázó változó-vektorral (ezek a \emph{regresszorok}), illetve egy-egy skalár $y_i$ \emph{label}-lel, avagy magyarázott változóval (amiket a regresszorok magyaráznak egy lineáris modell alapján, ezt később jobban kifejtjük). A sokaságból $n$ darab mintát veszünk (megfigyelést végzünk), \emph{a minták iid. normális eloszlásúak}, ami persze azt jelenti, hogy \emph{minden magyarázó változó-vektor egy vektorértékű normális eloszlású valószínűségi vektorváltozó}. Létezik egy másik konstrukció is, miszerint $\pmb{X}$ rögzített, és nem változik mintavételről mintavételre, ez azonban csak annyit jelent, hogy mindenhol, ahol feltételes eloszlás/várható érték van, onnan az $\mid \pmb{X}$ feltételt ki kell venni. Mi $\pmb{X}$-re mint valószínűségi vektorváltozók mátrixa tekintünk mostantól.
@@ -782,4 +794,71 @@
 	\]
 	ahol látható, hogy a jobb oldal második tagja pontosan a kihagyott $z$ változó miatti torzítás, avagy \emph{bias}.
 	
+	\section{A heteroszkedaszticitás kezelése, a GLS eljárás}
+	A Gauss-Markov feltevések egyike volt, hogy$\pmb{\Sigma}$ hiba variancia-kovariancia mátrix diagonális, és a diagonális elemek azonosan $\sigma^2$-ek. Láttuk azt is, hogy ezekre a $\sigma^2$-ekre torzítatlan becslést ad a $\widehat{\sigma^2}$ \emph{hibavariancia becslés}. Azt az esetet, amikor $\pmb{\Sigma}$ diagonális, azonban $\sigma^2$-ek nem egyenlőek, heteroszkedaszticitásnak hívjuk, és emellett a hiba variancia-kovariancia mátrix mellett a paraméterbecslés varianciája már nem a megszokott
+	\[
+		Var[\ebeta] = \sigma^2(\pmb{X}^T\pmb{X})^{-1}
+	\]
+	alakú, hiszen nem emelhettük ki $\sigma^2\pmb{I}$-t középről.
+	\\
+	\\
+	Tudjuk, hogy minden variancia-kovariancia mátrix szimmetrikus és pozitív szemidefinit. Ezért $\exists \pmb{P} : \pmb{P}\pmb{P}^T = \pmb{\Sigma}$, tehát felbonthatjuk a kovariancia mátrixot kettő, $\pmb{\Sigma}$-val azonos dimenziójú invertálható mátrix szorzatára (Ez analóg azzal, hogy $\mathbb{R}$-en minden pozitív szemidefinit (nemnegatív) valós számnak létezik négyzetgyöke, és a négyzetgyök csak akkor $0$, ha maga a szám $0$, de most a zérus kovariancia mátrix esetétől eltekintünk).
+	\\
+	\\
+	A célunk az, hogy $\pmb{\Sigma}$ kovariancia mátrixot $\sigma^2\pmb{I}$ alakúra hozzuk. Ha megszorozzuk balról $\pmb{P}^{-1}$-el a $\pmb{\e}$ hibatagot, a hiba varianciája:
+	\[
+		Var[\pmb{P}^{-1}\pmb{\e}] = \pmb{P}^{-1}\pmb{\Sigma}{\pmb{P}^{-1}}^T
+	\]
+	A felbontásból következően, és a ${\pmb{P}^T}^{-1} = {\pmb{P}^{-1}}^T$ összefüggést felhasználva:
+	\[
+		\pmb{P}^{-1}\pmb{\Sigma} = \pmb{P}^T \Longrightarrow \pmb{P}^{-1}\pmb{\Sigma}{\pmb{P}^{-1}}^T = \pmb{P}^T{\pmb{P}^{-1}}^T = \pmb{I}
+	\]
+	Azt kaptuk tehát, hogy ha a $\pmb{P}^{-1}$-el beszorzott módosított regressziós modellegyenletet tekintjük
+	\[
+		\pmb{P}^{-1}\pmb{X}\pmb{\beta} + \pmb{P}^{-1}\pmb{\e} = \pmb{P}^{-1}\pmb{y}
+	\]
+	akkor ebben a modellben a hiba varianciamátrixa az identitás mátrix, így nem áll fenn heteroszkedaszticitás.
+	\\
+	\\
+	A módosított modellel való paraméterbecslés tehát
+	\[
+		\ebeta = ((\pmb{P}^{-1}\pmb{X})^T(\pmb{P}^{-1}\pmb{X}))^{-1}(\pmb{P}^{-1}\pmb{X})^T\pmb{P}^{-1}\pmb{y}
+	\]
+	\[
+		\ebeta = (\pmb{X}^T{\pmb{P}^{-1}}^T\pmb{P}^{-1}\pmb{X})^{-1}\pmb{X}^T{\pmb{P}^{-1}}^T\pmb{P}^{-1}\pmb{y}
+	\]
+	Szintén a felbontásból, most már mátrixhatványokkal kiírva adódik, hogy
+	\[
+		\pmb{P} = \pmb{\Sigma}^{\frac{1}{2}}
+	\]
+	Így
+	\[
+		{\pmb{P}^{-1}}^T\pmb{P}^{-1} = {\pmb{\Sigma}^{-\frac{1}{2}}}^T\pmb{\Sigma}^{-\frac{1}{2}} = \pmb{\Sigma}^{-1}
+	\]
+	Ezzel a paraméterbecslés alakja:
+	\[
+		\ebeta_{GLS} = (\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{X})^{-1}\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{y}
+	\]
+	Ez már konzisztens a Gauss-Markov feltételekkel, így $\ebeta$ paraméterbecslés teljesíti a BLUE kritériumokat. Ez az eljárás egy speciális esete a \emph{Generalized Least Squares (GLS)} becslési eljárásnak, ahol $\pmb{\Sigma}$ nemdiagonális elemei mind $0$-k, az angol irodalomban \emph{Weighted Least Squares} néven szerepel. Ha $\pmb{\Sigma}$ nem is diagonális (azaz autokorreláció van a hibák között), akkor is elvégezhető a GLS eljárás. $\pmb{\Sigma}^{-1}$-t, azaz az inverz variancia-kovariancia mátrixot \emph{precíziós mátrixnak} is hívják.
+	
+	\subsection{*A GLS becslés analitikus levezetése}
+	$\ebeta_{GLS}$ alakját megkaphatjuk úgy is, ha tekintjük az alábbi optimalizációs problémát:
+	\[
+		(\pmb{y} - \pmb{X}\pmb{b})^T\pmb{\Sigma}^{-1}(\pmb{y} - \pmb{X}\pmb{b}) \rightarrow \underset{\pmb{b}}{argmin}
+	\]
+	Ez persze semmi más, mint a Mahalanobis távolság minimalizálása $\pmb{y}$ és $\pmb{X}\pmb{b}$ között $\pmb{b}$ szerint. Kibontva a kifejezést és a $\pmb{b}$ szerinti deriváltat $0$-ra állítva ($\pmb{b} = \pmb{\ebeta_{GLS}}$):
+	\[
+		2\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{X}\ebeta_{GLS} - 2\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{y} = 0
+	\]
+	Ebből
+	\[
+		\ebeta_{GLS} = (\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{X})^{-1}\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{y}
+	\]
+	Így is megkaptuk ugyanazt az alakot.
+	
+	\subsection{A Feasible Generalized Least Squares (FGLS) eljárás}
+	Ha nem ismerjük a valódi $\pmb{\Sigma}$ hibavariancia-kovariancia mátrixot, akkor a már bevezetett $\widehat{\sigma^2}$ becsült varianciákkal konstruálhatjuk meg a becsült $\widehat{\pmb{\Sigma}}$ mátrixot. Ezzel a becsült hibavariancia-kovariancia mátrixxal a paraméterbecslés alakja
+	\[
+		\ebeta_{FGLS} = (\pmb{X}^T\widehat{\pmb{\Sigma}}^{-1}\pmb{X})^{-1}\pmb{X}^T\widehat{\pmb{\Sigma}}^{-1}\pmb{y}
+	\]
 \end{document}
