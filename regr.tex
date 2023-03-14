@@ -796,36 +796,51 @@
 	\]
 	ahol látható, hogy a jobb oldal második tagja pontosan a kihagyott $z$ változó miatti torzítás, avagy \emph{bias}.
 	
-	\section{*MSE és a bias-variancia tradeoff}
+	\section{MSE és a bias-variancia tradeoff}
 	Tekintsünk egy általános
 	\[
-		\pmb{y} = \textswab{Q}(\pmb{X}) + \pmb{\e}
+		\pmb{y} = \textswab{P}(\pmb{X}) + \pmb{\e}
 	\]
-	modellt. Csakúgy, mint eddig, $\pmb{X}$ a regresszorok, $\pmb{y}$ a magyarázott változó vektora, $\textswab{Q}$ pedig valamilyen függvény. Az $\pmb{\e}$ hibák regresszorok szerinti feltételes várható értéke $0$. Figyeljük meg, hogy a lineáris regresszió esetében $\textswab{Q}$ a lineáris $\pmb{\beta}$ együtthatóvektor. A célunk, hogy megtaláljuk azt a $\widehat{\textswab{Q}}$ függvényt, amivel a becsült
+	modellt. Csakúgy, mint eddig, $\pmb{X}$ a regresszorok, $\pmb{y}$ a magyarázott változó vektora, $\textswab{P}$ pedig valamilyen függvény. Az $\pmb{\e}$ hibák regresszorok szerinti feltételes várható értéke $0$. Figyeljük meg, hogy a lineáris regresszió esetében $\textswab{P}$ a lineáris $\pmb{\beta}$ együtthatóvektor. A célunk, hogy megtaláljuk azt a $\widehat{\textswab{P}}$ függvényt, amivel a becsült
 	\[
-		\hat{\pmb{y}} = \widehat{\textswab{Q}}(\pmb{X})
+		\hat{\pmb{y}} = \widehat{\textswab{P}}(\pmb{X})
 	\]
-	
-	A $\hat{\pmb{y}}$-ok és a tényleges $\pmb{y}$-ok négyzetes távolsága a lehető legkisebb. Nyilvánvalóan - ezt a regressziónál is láttuk már - egy olyan $\widehat{\textswab{Q}}$-t találni, ami \emph{tökéletesen} becsüli $\pmb{y}$-t reális esetben lehetetlen, így fontos lesz, hogy valahogyan számszerűsíthessük a még megfigyeletlen regresszorokon vett várható tévedésünket.
+	$\hat{\pmb{y}}$-ok és a tényleges $\pmb{y}$-ok négyzetes távolsága a lehető legkisebb. Nyilvánvalóan - ezt a regressziónál is láttuk már - egy olyan $\widehat{\textswab{P}}$-t találni, ami \emph{tökéletesen} becsüli $\pmb{y}$-t reális esetben lehetetlen, így fontos lesz, hogy valahogyan számszerűsíthessük a megfigyeléseken (mintán) alapuló illetve a még megfigyeletlen regresszorokon vett várható tévedésünket.
 	\\
 	\\
-	A \emph{várható négyzetes tévedés mértéke} egy valamilyen \emph{megfigyeletlen} $\pmb{x}$ magyarázó változó-vektoron, más néven a \emph{Mean Squared Error} ($MSE$):
+	A \emph{Mean Squared Error}, röviden \emph{MSE} klasszikusan az átlagos avagy várható négyzetes eltérések összegét jelenti a prediktált $\hat{\pmb{y}}$ és a tényleges $\pmb{y}$-ok között. Attól függően azonban, hogy mit akarunk vele pontosan kifejezni, definiálhatjuk a \emph{prediktorok} (a fenti "klasszikus" eltérés-négyzetösszeges definíció) és a \emph{becslések} szemszögéből is. 
+	\\
+	\\
+	A \emph{prediktorok} szemszögéből a definíció egy $n$ elemű mintán
 	\[
-		MSE = \mathbb{E}[(\pmb{y} - \widehat{\textswab{Q}}(\pmb{x}))^2]
+		MSE := \frac{1}{n}\sum_{i=1}^{n}{(y_i - \hat{y}_i)^2}
 	\]
-	felbontható \emph{bias}, \emph{variancia} illetve magyarázatlan hiba $\sigma^2$ részekre:
+	Kompaktabban kifejezve a tényleges $\pmb{e}$ hibákkal:
 	\[
-		MSE = \mathbb{E}[(\pmb{y} - \widehat{\textswab{Q}}(\pmb{x}))^2] = (Bias[\widehat{\textswab{Q}}(\pmb{x})])^2 + Var[\widehat{\textswab{Q}}(\pmb{x})] + \sigma^2
+		MSE := \frac{1}{n}\pmb{e}^T\pmb{e}
 	\]
-	ahol persze a $\mathbb{E}$ várható érték operátor a sokaságból választott véletlenszerű megfigyeletlen $\pmb{x}$-en fut végig, és ahol
+	Ha $\textswab{P}$ becsléséhez nem használtuk fel az összes $n$ elemet, hanem csak $m < n$-et, akkor az $MSE$ definiálható úgy is, mint az átlagos négyzetes hiba a becsléshez fel nem használt adatpontokon:
 	\[
-		Bias[\widehat{\textswab{Q}}(\pmb{x})] = \mathbb{E}[\widehat{\textswab{Q}}(\pmb{x}) - \textswab{Q}(\pmb{x})] = \mathbb{E}[\widehat{\textswab{Q}}(\pmb{x})] - \mathbb{E}[y(\pmb{x})]
+		MSE := \frac{1}{n-m}\sum_{i=m+1}^{n}{(y_i - \hat{y}_i)^2}
 	\]
-	a várható eltérés a tényleges $\pmb{y}$-októl, illetve
+	\\
+	\\
+	A \emph{becslés} szemszögéből az $MSE$ a $\widehat{\textswab{P}}$ becslésünkre vonatkozik, mégpedig egy teoretikus valódi $\textswab{P}$ függvény mellett
 	\[
-		Var[\widehat{\textswab{Q}}(\pmb{x})] = \mathbb{E}[(\mathbb{E}[\widehat{\textswab{Q}}(\pmb{x})] - \widehat{\textswab{Q}}(\pmb{x}))^2]
+		MSE(\widehat{\textswab{P}}) = \mathbb{E}_{\textswab{P}}[(\widehat{\textswab{P}} - \textswab{P})^2]
 	\]
-	a modellfüggvény becslésének \emph{bizonytalansága}. Minél komplexebb $\widehat{\textswab{Q}}$, annál jobban csökken a bias, azonban egyidejűleg nő a variancia. Minél egyszerűbb $\widehat{\textswab{Q}}$, annál nagyobb a bias, viszont a variancia kicsi lesz. 
+	Ez semmi más, mint a \emph{második momentuma} a $\widehat{\textswab{P}} - \textswab{P}$ becslés-eltérésnek. Ebből a definícióból következik a \emph{bias-variancia tradeoff}, melynek fontos következményei lesznek. Lássuk ezt be!
+	\\
+	\\
+	Tudjuk, hogy tetszőleges $\xi$ valószínűségi változóra $\mathbb{E}[\xi^2] = Var[\xi] + \mathbb{E}^2[\xi]$. Most $\xi = \widehat{\textswab{P}} - \textswab{P}$-vel:
+	\[
+		MSE = \mathbb{E}[(\widehat{\textswab{P}} - \textswab{P})^2] = Var[\widehat{\textswab{P}} - \textswab{P}] + \mathbb{E}^2[\widehat{\textswab{P}} - \textswab{P}]
+	\]
+	A $\mathbb{E}[\widehat{\textswab{P}} - \textswab{P}]$ várható eltérést ($\textswab{P}$-hez képest) hívjuk \emph{bias}-nak, avagy \emph{torzításnak}, ennek négyzetére $Bias^2[\textswab{P}]$-ként hivatkozunk mostantól. Mivel $\textswab{P}$ a modell szerint egy konkrét függvény, így $Var[\widehat{\textswab{P}} - \textswab{P}] = Var[\widehat{\textswab{P}}]$, és ezzel
+	\[
+		MSE = \mathbb{E}[(\widehat{\textswab{P}} - \textswab{P})^2] = Var[\widehat{\textswab{P}}] + Bias^2[\widehat{\textswab{P}}].
+	\]
+	A becslés szemszögéből tehát az $MSE$ semmi más, mint a becslés varianciájának és torzítás-négyzetének összege. Ezt az összefüggést hívjuk bias-variancia tradeoffnak, hiszen adott $MSE$ mellett ha az egyiket csökkenteni is tudom, a másik nőni fog. Komplex $\widehat{\textswab{P}}$ becslés mellett a bias, avagy torzítottság alacsony lesz, azonban magas varianciája, avagy \emph{bizonytalansága} lesz a becslésemnek. Egyszerű $\widehat{\textswab{P}}$ mellett pedig a bias lesz magas, alacsony varianciával.
 	
 	\section{A heteroszkedaszticitás kezelése, a GLS eljárás}
 	A Gauss-Markov feltevések egyike volt, hogy$\pmb{\Sigma}$ hiba variancia-kovariancia mátrix diagonális, és a diagonális elemek azonosan $\sigma^2$-ek. Láttuk azt is, hogy ezekre a $\sigma^2$-ekre torzítatlan becslést ad a $\widehat{\sigma^2}$ \emph{hibavariancia becslés}. Azt az esetet, amikor $\pmb{\Sigma}$ diagonális, azonban $\sigma^2$-ek nem egyenlőek, heteroszkedaszticitásnak hívjuk, és emellett a hiba variancia-kovariancia mátrix mellett a paraméterbecslés varianciája már nem a megszokott
