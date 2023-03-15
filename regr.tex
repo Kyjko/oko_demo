@@ -9,6 +9,8 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{xcolor}
 \usepackage{pgfplotstable}
+\usepackage{lmodern}
+
 \pgfplotsset{compat=newest}
 
 \title{Lineáris regresszió elméleti összefoglaló}
@@ -76,6 +78,42 @@
 	\pmb{A}^{\ddagger} := \pmb{A}^T(\pmb{A}\pmb{A}^T)^{-1} \in \mathbb{R}^{n \times m}
 	\]
 	Bár ezt nem fogjuk a későbbiekben használni, érdemes lehet megjegyezni, hogy a jobb oldali pszeudoinverzzel való balról szorzás esetén - hasonlóan a bal oldali pszeudoinverzhez - projekciómátrixot kapunk, csak most $\pmb{A}$ sorvektorai által kifeszített vektortérre.
+	
+	\subsection{*Mátrixok szinguláris értékei, SVD}
+	Legyen $\pmb{A} \in \mathbb{C}^{n \times m}$ tetszőleges komplex mátrix. Ekkor $\pmb{A}$ \emph{szinguláris érték felbontása (Singular Value Decomposition - SVD)}:
+	\[
+		\pmb{A} = \pmb{U}\pmb{S}\pmb{V}^*
+	\]
+	ahol $\pmb{U} \in \mathbb{C}^{n \times n}$ és $\pmb{V} \in \mathbb{C}^{m \times m}$ unitér mátrixok, és $\pmb{S} \in \mathbb{R}^{n \times m}$ kvázi-diagonális, azaz $n > m$ esetben
+	\[
+		\pmb{S} =
+		\begin{bmatrix}
+		\sigma_1 & 0 & \dots & 0 \\
+		0 & \sigma_2 & \dots & 0 \\
+		\vdots & \vdots & \ddots & \vdots \\
+		0 & 0 & \dots & \sigma_m \\
+		0 & 0 & \dots & 0 \\
+		\vdots & \vdots & \ddots & \vdots \\
+		0 & 0 & \dots & 0
+		\end{bmatrix}_{n \times m}
+	\]
+	Ilyen felbontás \emph{mindig} létezik, bármilyen is legyen $\pmb{A}$ dimenziója. Ha $\pmb{A}$ valós mátrix, akkor $\pmb{U}$ és $\pmb{V}$ \emph{ortogonálisak}, és így persze a konjugált transzponálás ekvivalens lesz a transzponálással. $\pmb{S}$ $\sigma$ elemei a \emph{szinguláris értékei} $\pmb{A}$-nak. Figyeljük meg, hogy
+	\[
+		\pmb{A}^T\pmb{A} = \pmb{V}\pmb{S}^T\pmb{U}^T\pmb{U}\pmb{S}\pmb{V}^T = \pmb{V}\pmb{S}^T\pmb{S}\pmb{V}^T,
+	\]
+	azaz $\pmb{A}^T\pmb{A}$ spektrálfelbontása lesz. $\pmb{V}$ oszlopai tehát $\pmb{A}^T\pmb{A}$ sajátvektorai lesznek, míg hasonlóan belátható, hogy $\pmb{U}$ oszlopai pedig $\pmb{A}\pmb{A}^T$ sajátvektorai lesznek (gondoljuk meg, hogy minden szimmetrikus valós mátrix ortogonálisan spektrálfelbontható). Mindkét esetben $\pmb{S}^T\pmb{S}$ négyzetes mátrix diagonális elemei a szinguláris értékek négyzetei lesznek, azaz kimondható, hogy $\pmb{A}$ szinguláris értékei semmi mások, mint $\pmb{A}^T\pmb{A}$ sajátértékeinek négyzetgyökei. Innen persze az is következik, hogy ha $\pmb{A}^T\pmb{A}$ szinguláris, azaz van $0$ sajátértéke, akkor biztosan lesz $0$ szinguláris értéke $\pmb{A}$-nak. Innen következik, hogy ha még mindig az $n > m$ esetnél maradva $\pmb{A}$ oszloprangja kisebb, mint oszlopainak száma (lineárisan összefüggő oszlopai vannak), akkor $\pmb{A}^T\pmb{A}$-nak lesz $0$ sajátértéke, tehát nem lesz invertálható.
+	\\
+	\\
+	Az SVD segítségével kifejezhető $\pmb{A}$ Moore-Penrose pszeudoinverze is (az inverz a transzpozícióhoz hasonlóan megfordítja a mátrixszorzás sorrendjét):
+	\[
+		\pmb{A}^{\dagger} = (\pmb{A}^T\pmb{A})^{-1}\pmb{A}^T = (\pmb{V}\pmb{S}^T\pmb{U}^T\pmb{U}\pmb{S}\pmb{V}^T)^{-1}\pmb{V}\pmb{S}^T\pmb{U}^T = \pmb{V}\pmb{S}^{-1}{\pmb{S}^T}^{-1}\pmb{V}^T\pmb{V}\pmb{S}^T\pmb{U}^T
+	\]
+	\[
+		\pmb{A}^{\dagger} = \pmb{V}^T\pmb{S}^{\dagger}\pmb{U}^T
+	\]
+	Mivel $\pmb{S}$ maga sem négyzetes mátrix feltétlenül, így $\pmb{S}^{-1}$ és ${\pmb{S}^T}^{-1}$ valójában $\pmb{S}^{\dagger}$ illetve ${\pmb{S}^T}^{\dagger}$ Moore-Penrose pszeudoinverzeket jelenti. A pszeudoinverz tulajdonságai hasonlók az egyszerű inverzéhez.
+	Innen is látszik, hogy $\pmb{A}^{\dagger}$ csak akkor létezik, ha $\pmb{S}^{\dagger}$ létezik, ami persze $\pmb{S}$ kvázi-diagonalitásából következően akkor igaz, ha $\pmb{S}$ oszlopai között nincs csupa $0$-ákból álló, azaz nincs $\sigma = 0$ szinguláris értéke $\pmb{A}$-nak.
+	
 	\subsection{Valószínűségi vektorváltozók}
 	Egy $\pmb{\xi} = [\xi_1, \dots , \xi_n]^T$ vektort \emph{valószínűségi vektorváltozónak} hívunk, ha $\forall i$-re $\xi_i$ skalárértékű valószínűségi változó. A továbbiakban csak a vektorértékű normális eloszlást követő valószínűségi vektorváltozókkal foglalkozunk, ezek formálisan felírva:
 	\[
@@ -850,7 +888,7 @@
 	alakú, hiszen nem emelhettük ki $\sigma^2\pmb{I}$-t középről.
 	\\
 	\\
-	Tudjuk, hogy minden variancia-kovariancia mátrix szimmetrikus és pozitív szemidefinit. Ezért $\exists \pmb{P} : \pmb{P}\pmb{P}^T = \pmb{\Sigma}$, tehát felbonthatjuk a kovariancia mátrixot kettő, $\pmb{\Sigma}$-val azonos dimenziójú invertálható mátrix szorzatára (Ez analóg azzal, hogy $\mathbb{R}$-en minden pozitív szemidefinit (nemnegatív) valós számnak létezik négyzetgyöke, és a négyzetgyök csak akkor $0$, ha maga a szám $0$, de most a zérus kovariancia mátrix esetétől eltekintünk).
+	Tudjuk, hogy minden variancia-kovariancia mátrix szimmetrikus és pozitív szemidefinit. Ezért $\exists \pmb{P} : \pmb{P}\pmb{P}^T = \pmb{\Sigma}$ (ez a \emph{Cholesky-felbontás}), tehát felbonthatjuk a kovariancia mátrixot kettő, $\pmb{\Sigma}$-val azonos dimenziójú invertálható mátrix szorzatára (Ez analóg azzal, hogy $\mathbb{R}$-en minden pozitív szemidefinit (nemnegatív) valós számnak létezik négyzetgyöke, és a négyzetgyök csak akkor $0$, ha maga a szám $0$, de most a zérus kovariancia mátrix esetétől eltekintünk).
 	\\
 	\\
 	A célunk az, hogy $\pmb{\Sigma}$ kovariancia mátrixot $\sigma^2\pmb{I}$ alakúra hozzuk. Ha megszorozzuk balról $\pmb{P}^{-1}$-el a $\pmb{\e}$ hibatagot, a hiba varianciája:
@@ -903,8 +941,48 @@
 	\]
 	Így is megkaptuk ugyanazt az alakot.
 	\subsection{A Feasible Generalized Least Squares (FGLS) eljárás}
-	Ha nem ismerjük a valódi $\pmb{\Sigma}$ hibavariancia-kovariancia mátrixot, akkor a már bevezetett $\widehat{\sigma^2}$ becsült varianciákkal konstruálhatjuk meg a becsült $\widehat{\pmb{\Sigma}}$ mátrixot. Ezzel a becsült hibavariancia-kovariancia mátrixxal a paraméterbecslés alakja
+	Ha nem ismerjük a valódi $\pmb{\Sigma}$ hibavariancia-kovariancia mátrixot, akkor a már bevezetett $\widehat{\sigma^2}$ becsült varianciákkal konstruálhatjuk meg a becsült $\widehat{\pmb{\Sigma}}$ mátrixot.
+	\\
+	\\
+	Az $FGLS$ eljárás \emph{kétlépcsős}, első lépésként először is elvégzünk a módosítatlan $\pmb{X}\pmb{\beta} + \pmb{\e} = \pmb{y}$ modellel egy egyszerű $OLS$ becslést, melyből $\ebeta_{OLS}$-t kapjuk (ez persze heteroszkedaszticitás esetén nem BLUE becslés). Az így kapott
+	\[
+		\pmb{e} = \pmb{y} - \pmb{X}\ebeta_{OLS}
+	\]
+	hibavektorokkal megbecsüljük $\widehat{\pmb{\Sigma}}$ hibavariancia-kovariancia mátrixot:
+	\[
+		\widehat{\sigma^2} = \frac{1}{n-p}\pmb{e}^T\pmb{e}
+	\]
+	\[
+		\widehat{\pmb{\Sigma}} = 
+		\begin{bmatrix}
+			\widehat{\sigma_1^2} & 0 & \dots & 0 \\
+			0 & \widehat{\sigma_2^2} & \dots & 0 \\
+			\vdots & \vdots & \ddots & \vdots \\
+			0 & 0 & \dots & \widehat{\sigma_n^2}
+		\end{bmatrix}
+	\]
+	Második lépésként az első lépésben kapott $\widehat{\pmb{\Sigma}}$ mátrixxal $GLS$ becsléssel megkapjuk a
 	\[
 		\ebeta_{FGLS} = (\pmb{X}^T\widehat{\pmb{\Sigma}}^{-1}\pmb{X})^{-1}\pmb{X}^T\widehat{\pmb{\Sigma}}^{-1}\pmb{y}
 	\]
+	FGLS paraméterbecslést. Ez az eljárás \emph{iterálható}, azaz vehetjük az $FGLS$ becslésből kapott
+	\[
+		\pmb{e}_{FGLS} = \pmb{y} = \pmb{X}\ebeta_{FGLS}
+	\]
+	hibavektort, és újrabecsülhetjük $\widehat{\pmb{\Sigma}}$-t:
+	\[
+		\widehat{\pmb{\Sigma}}_{FGLS} =
+		\begin{bmatrix}
+			\widehat{\sigma_{FGLS,1}^2} & 0 & \dots & 0 \\
+			0 & \widehat{\sigma_{FGLS,2}^2} & \dots & 0 \\
+			\vdots & \vdots & \ddots & \vdots \\
+			0 & 0 & \dots & \widehat{\sigma_{FGLS,n}^2}
+		\end{bmatrix}
+	\]
+	Ezzel az újrabecsült kovariancia-variancia mátrixxal az új paraméterbecslésünk
+	\[
+		\ebeta_{FGLS2} = (\pmb{X}^T\widehat{\pmb{\Sigma}}_{FGLS}^{-1}\pmb{X})^{-1}\pmb{X}^T\widehat{\pmb{\Sigma}}_{FGLS}^{-1}\pmb{y}
+	\]
+	Az iteráció tetszőlegesen sokáig folytatódhat, és minden iterációval egyre közelebb kerülünk a tényleges $\pmb{\beta}$-hoz.
+	
 \end{document}
