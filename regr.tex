@@ -11,6 +11,8 @@
 \usepackage{pgfplotstable}
 \usepackage{lmodern}
 
+\usetikzlibrary{calc}
+
 \pgfplotsset{compat=newest}
 
 \renewcommand*{\contentsname}{Tartalom}
@@ -78,12 +80,11 @@
 	\[
 	x  = \pmb{A}^{\dagger}y
 	\]
-	
 	Az $n < m$ esetben alulhatározottság áll fenn, itt \emph{jobb oldali pszeudoinverzről} beszélhetünk:
 	\[
 	\pmb{A}^{\ddagger} := \pmb{A}^T(\pmb{A}\pmb{A}^T)^{-1} \in \mathbb{R}^{n \times m}
 	\]
-	Bár ezt nem fogjuk a későbbiekben használni, érdemes lehet megjegyezni, hogy a jobb oldali pszeudoinverzzel való balról szorzás esetén - hasonlóan a bal oldali pszeudoinverzhez - projekciómátrixot kapunk, csak most $\pmb{A}$ sorvektorai által kifeszített vektortérre.
+	Bár ezt nem fogjuk a későbbiekben használni, érdemes lehet megjegyezni, hogy a jobb oldali pszeudoinverzzel való balról szorzás esetén - hasonlóan a bal oldali pszeudoinverzhez - projekciómátrixot kapunk, csak most $\pmb{A}$ sorvektorai által kifeszített vektortérre. Bal oldali pszeudoinverz csakis $n \ge m$ esetben létezik, míg jobboldali az $n \le m$ esetben.
 	
 	\section{*Mátrixok szinguláris értékei, SVD}
 	Legyen $\pmb{A} \in \mathbb{C}^{n \times m}$ tetszőleges komplex mátrix. Ekkor $\pmb{A}$ \emph{szinguláris érték felbontása (Singular Value Decomposition - SVD)}:
@@ -165,6 +166,7 @@
 	\end{bmatrix}
 	\]
 	ahol $\sigma_1^2, \dots, \sigma_n^2$ rendre $\xi_1, \dots, \xi_n$ varianciái.
+	
 	\section{Mátrixdifferenciálás nagyon röviden}
 	Legyenek $\pmb{a}, \pmb{b} \in \mathbb{R}^{k \times 1}$ vektorok. Ekkor
 	\[
@@ -182,6 +184,7 @@
 	\[
 	\frac{\partial 2\pmb{\beta}^T\pmb{A}^T\pmb{y}}{\partial\pmb{\beta}} = \frac{\partial 2\pmb{\beta}^T(\pmb{A}^T\pmb{y})}{\partial\pmb{\beta}} = 2\pmb{A}^T\pmb{y}
 	\]
+	
 	\section{*Pont és eloszlás Mahalanobis távolsága}
 	Ez a rész csak érdekességként szerepel a PDF-ben, a Generalized Least Squares paraméterbecslés analitikus levezetésének bemutatásában használjuk csak, akinek nincs ideje átolvasni ezt a részt, nyugodtan ugorja át.
 	\\
@@ -194,6 +197,25 @@
 	\[
 		d_M(\pmb{x}, \pmb{y}; F) := \sqrt{(\pmb{x} - \pmb{y})^T\pmb{\Sigma}^{-1}(\pmb{x} - \pmb{y})}
 	\]
+	\section{*Particionált négyzetes mátrixok}
+	Legyen $\pmb{A} \in \mathbb{R}^{n \times n}$ négyzetes invertálható mátrix. Particionáljuk $\pmb{A}$-t az alábbi módon:
+	\[
+		\pmb{A} =
+		\begin{bmatrix}
+		\pmb{A}_{11} & \pmb{A}_{12} \\
+		\pmb{A}_{21} & \pmb{A}_{22}
+		\end{bmatrix}
+	\]
+	ahol $\pmb{A}_{11} \in \mathbb{R}^{m_1 \times m_1}$, $\pmb{A}_{22} \in \mathbb{R}^{m_2 \times m_2}$, $m_1 + m_2 = m$ maguk is invertálható mátrixok. Ekkor $\pmb{A}^{-1}$ felírható:
+	\[
+		\pmb{A}^{-1} = 
+		\begin{bmatrix}
+		(\pmb{A}_{11}-\pmb{A}_{12}\pmb{A}_{22}^{-1}\pmb{A}_{21})^{-1} & -\pmb{A}_{11}^{-1}\pmb{A}_{12}(\pmb{A}_{22}-\pmb{A}_{21}\pmb{A}_{11}^{-1}\pmb{A}_{12})^{-1} \\
+		-\pmb{A}_{22}^{-1}\pmb{A}_{21}(\pmb{A}_{11}-\pmb{A}_{12}\pmb{A}_{22}^{-1}\pmb{A}_{21})^{-1} & (\pmb{A}_{22}-\pmb{A}_{21}\pmb{A}_{11}^{-1}\pmb{A}_{12})^{-1}
+		\end{bmatrix}
+	\]
+	
+	
 	\chapter{A lineáris regresszió}
 	\section{A regressziós modell}
 	A regresszió kiindulópontja egy $\mathscr{X}$ sokaság, melynek minden tagja rendelkezik $\pmb{x}_i$ \emph{featurevektor}-ral, avagy magyarázó változó-vektorral (ezek a \emph{regresszorok}), illetve egy-egy skalár $y_i$ \emph{label}-lel, avagy magyarázott változóval (amiket a regresszorok magyaráznak egy lineáris modell alapján, ezt később jobban kifejtjük). A sokaságból $n$ darab mintát veszünk (megfigyelést végzünk), \emph{a minták iid-k, azaz függetlenek és azonos eloszlásúak}, ami persze azt jelenti, hogy \emph{minden magyarázó változó-vektor egy vektorértékű valószínűségi vektorváltozó}. Létezik egy másik konstrukció is, miszerint $\pmb{X}$ rögzített, és nem változik mintavételről mintavételre, ez azonban csak annyit jelent, hogy mindenhol, ahol feltételes eloszlás/várható érték van, onnan az $\mid \pmb{X}$ feltételt ki kell venni. Mi $\pmb{X}$-re mint valószínűségi vektorváltozók mátrixa tekintünk mostantól.
@@ -300,6 +322,29 @@
 	\[
 	\ebeta = \pmb{X}^{\dagger}\pmb{y} = (\pmb{X}^T\pmb{X})^{-1}\pmb{X}^T\pmb{y}
 	\]
+	
+	\begin{center}
+	\begin{tikzpicture}
+		\begin{axis}[hide axis]
+			\addplot3 [
+			domain=0:5,
+			domain y = 0:5,
+			samples = 40,
+			samples y = 40,
+			surf] {x + y};
+			
+			\node[] at (axis cs: 4,2) {$\pmb{X}$ oszloptere};
+			
+			%\draw[|->, black](0,0,0) -- (1,1,10);
+			\coordinate (A) at (0,0,0);
+			\coordinate (B) at (1,3,0);
+			\draw [stealth-stealth] (A) -- (B) node[below,font=\small]{};
+			\draw [ -stealth] (0,0,0) -- (1,1,9) coordinate (yn) node[right]{$y$};
+			\draw[dashed] (yn) --  node[midway,above right]{$e$} ($(A)!(yn)!(B)$) node[above left]{};
+		\end{axis}
+		
+	\end{tikzpicture}
+	\end{center}
 	Ebben az esetben $\pmb{y}$-t az $\pmb{X}$ design mátrix oszlopterére vetítettük. $\pmb{X}^T\pmb{X}$ \emph{Gram-mátrix} néven is ismeretes (egyébként $\pmb{X}\pmb{X}^T$-ra is szoktak utalni ezen a néven, annyi különbséggel, hogy az előbbi a regresszorok közti korreláció mértékét mutatja a mintavételeken keresztülfutva, egyfajta \emph{temporális} módon, az utóbbi pedig magukon a regresszorokon keresztülfutva egyfajta \emph{térbeli} korrelációt mutat). Az $\pmb{X}^T\pmb{X}$ mátrix determinánsát \emph{Gram-determinánsnak} is hívják.
 	\\
 	\\
