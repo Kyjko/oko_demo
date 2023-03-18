@@ -13,6 +13,8 @@
 
 \pgfplotsset{compat=newest}
 
+\renewcommand*{\contentsname}{Tartalom}
+
 \title{Lineáris regresszió elméleti összefoglaló}
 \author{Bognár Miklós}
 \date{Bevezetés az Ökonometriába}
@@ -113,7 +115,7 @@
 		\pmb{A}^{\dagger} = (\pmb{A}^T\pmb{A})^{-1}\pmb{A}^T = (\pmb{V}\pmb{S}^T\pmb{U}^T\pmb{U}\pmb{S}\pmb{V}^T)^{-1}\pmb{V}\pmb{S}^T\pmb{U}^T = \pmb{V}\pmb{S}^{-1}{\pmb{S}^T}^{-1}\pmb{V}^T\pmb{V}\pmb{S}^T\pmb{U}^T
 	\]
 	\[
-		\pmb{A}^{\dagger} = \pmb{V}^T\pmb{S}^{\dagger}\pmb{U}^T
+		\pmb{A}^{\dagger} = \pmb{V}\pmb{S}^{\dagger}\pmb{U}^T
 	\]
 	Mivel $\pmb{S}$ maga sem négyzetes mátrix feltétlenül, így $\pmb{S}^{-1}$ és ${\pmb{S}^T}^{-1}$ valójában $\pmb{S}^{\dagger}$ illetve ${\pmb{S}^T}^{\dagger}$ Moore-Penrose pszeudoinverzeket jelenti. A pszeudoinverz tulajdonságai hasonlók az egyszerű inverzéhez.
 	Innen is látszik, hogy $\pmb{A}^{\dagger}$ csak akkor létezik, ha $\pmb{S}^{\dagger}$ létezik, ami persze $\pmb{S}$ kvázi-diagonalitásából következően akkor igaz, ha $\pmb{S}$ oszlopai között nincs csupa $0$-ákból álló, azaz nincs $\sigma = 0$ szinguláris értéke $\pmb{A}$-nak.
@@ -555,7 +557,7 @@
 		\end{tikzpicture}
 	\end{center}
 
-	\subsection{$*\ebeta$ eloszlása}
+	\subsection{$\ebeta$ eloszlása}
 	Láttuk, hogy
 	\[
 		\pmb{y} \mid \pmb{X} \sim \mathcal{N}(\pmb{X}\pmb{\beta}, \pmb{\Sigma})
@@ -906,14 +908,14 @@
 	\[
 		MSE = \mathbb{E}[(\widehat{\textswab{P}} - \textswab{P})^2] = Var[\widehat{\textswab{P}} - \textswab{P}] + \mathbb{E}^2[\widehat{\textswab{P}} - \textswab{P}]
 	\]
-	A $\mathbb{E}[\widehat{\textswab{P}} - \textswab{P}]$ várható eltérést ($\textswab{P}$-hez képest) hívjuk \emph{bias}-nak, avagy \emph{torzításnak}, ennek négyzetére $Bias^2[\textswab{P}]$-ként hivatkozunk mostantól. Mivel $\textswab{P}$ a modell szerint egy konkrét függvény, így $Var[\widehat{\textswab{P}} - \textswab{P}] = Var[\widehat{\textswab{P}}]$, és ezzel
+	A $\mathbb{E}[\widehat{\textswab{P}} - \textswab{P}]$ várható eltérést ($\textswab{P}$-hez képest) hívjuk \emph{bias}-nak, avagy \emph{torzításnak}, ennek négyzetére $Bias^2[\widehat{\textswab{P}}]$-ként hivatkozunk mostantól. Mivel $\textswab{P}$ a modell szerint egy konkrét függvény, így $Var[\widehat{\textswab{P}} - \textswab{P}] = Var[\widehat{\textswab{P}}]$, és ezzel
 	\[
 		MSE = \mathbb{E}[(\widehat{\textswab{P}} - \textswab{P})^2] = Var[\widehat{\textswab{P}}] + Bias^2[\widehat{\textswab{P}}].
 	\]
 	A becslés szemszögéből tehát az $MSE$ semmi más, mint a becslés varianciájának és torzítás-négyzetének összege. Ezt az összefüggést hívjuk bias-variancia tradeoffnak, hiszen adott $MSE$ mellett ha az egyiket csökkenteni is tudom, a másik nőni fog. Komplex $\widehat{\textswab{P}}$ becslés mellett a bias, avagy torzítottság alacsony lesz, azonban magas varianciája, avagy \emph{bizonytalansága} lesz a becslésemnek. Egyszerű $\widehat{\textswab{P}}$ mellett pedig a bias lesz magas, alacsony varianciával.
 	
 	\section{A heteroszkedaszticitás kezelése, a GLS eljárás}
-	A Gauss-Markov feltevések egyike volt, hogy$\pmb{\Sigma}$ hiba variancia-kovariancia mátrix diagonális, és a diagonális elemek azonosan $\sigma^2$-ek. Láttuk azt is, hogy ezekre a $\sigma^2$-ekre torzítatlan becslést ad a $\widehat{\sigma^2}$ \emph{hibavariancia becslés}. Azt az esetet, amikor $\pmb{\Sigma}$ diagonális, azonban $\sigma^2$-ek nem egyenlőek, heteroszkedaszticitásnak hívjuk, és emellett a hiba variancia-kovariancia mátrix mellett a paraméterbecslés varianciája már nem a megszokott
+	A Gauss-Markov feltevések egyike volt, hogy $\pmb{\Sigma}$ hiba variancia-kovariancia mátrix diagonális, és a diagonális elemek azonosan $\sigma^2$-ek. Láttuk azt is, hogy ezekre a $\sigma^2$-ekre torzítatlan becslést ad a $\widehat{\sigma^2}$ \emph{hibavariancia becslés}. Azt az esetet, amikor $\pmb{\Sigma}$ diagonális, azonban $\sigma^2$-ek nem egyenlőek, heteroszkedaszticitásnak hívjuk, és emellett a hiba variancia-kovariancia mátrix mellett a paraméterbecslés varianciája már nem a megszokott
 	\[
 		Var[\ebeta] = \sigma^2(\pmb{X}^T\pmb{X})^{-1}
 	\]
@@ -957,7 +959,8 @@
 	\[
 		\ebeta_{GLS} = (\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{X})^{-1}\pmb{X}^T\pmb{\Sigma}^{-1}\pmb{y}
 	\]
-	Ez már konzisztens a Gauss-Markov feltételekkel, így $\ebeta$ paraméterbecslés teljesíti a BLUE kritériumokat. Ez az eljárás egy speciális esete a \emph{Generalized Least Squares (GLS)} becslési eljárásnak, ahol $\pmb{\Sigma}$ nemdiagonális elemei mind $0$-k, az angol irodalomban \emph{Weighted Least Squares} néven szerepel. Ha $\pmb{\Sigma}$ nem is diagonális (azaz autokorreláció van a hibák között), akkor is elvégezhető a GLS eljárás. $\pmb{\Sigma}^{-1}$-t, azaz az inverz variancia-kovariancia mátrixot \emph{precíziós mátrixnak} is hívják.
+	Ez már konzisztens a Gauss-Markov feltételekkel, így $\ebeta$ paraméterbecslés teljesíti a BLUE kritériumokat. Ez az eljárás egy speciális esete a \emph{Generalized Least Squares (GLS)} becslési eljárásnak, ahol $\pmb{\Sigma}$ nemdiagonális elemei mind $0$-k, az angol irodalomban \emph{Weighted Least Squares} néven szerepel. $\pmb{\Sigma}^{-1}$-t, azaz az inverz variancia-kovariancia mátrixot \emph{precíziós mátrixnak} is hívják. A $GLS$ működik autokorreláció esetén is, azaz tetszőleges pozitív definit $\pmb{\Sigma}$ hibavariancia mátrixxal is, és igazából ez az amit "hivatalosan" $GLS$-nek hívnak.
+	
 	\subsection{*A GLS becslés analitikus levezetése}
 	$\ebeta_{GLS}$ alakját megkaphatjuk úgy is, ha tekintjük az alábbi optimalizációs problémát:
 	\[
@@ -1014,5 +1017,76 @@
 		\ebeta_{FGLS2} = (\pmb{X}^T\widehat{\pmb{\Sigma}}_{FGLS}^{-1}\pmb{X})^{-1}\pmb{X}^T\widehat{\pmb{\Sigma}}_{FGLS}^{-1}\pmb{y}
 	\]
 	Az iteráció tetszőlegesen sokáig folytatódhat, és minden iterációval egyre közelebb kerülünk a tényleges $\pmb{\beta}$-hoz.
+	
+	\chapter{Paraméterszignifikancia-tesztek lineáris regresszió esetén}
+	A lineáris regresszió tanulmányozása folyamán fontos kitérni a paraméterbecslések \emph{szignifikanciájára}, azaz arra a kérdésre, hogy jelentősen csökken-e a $\ebeta$-val való predikciós/magyarázó erő, ha $\ebeta$ egy vagy több elemét $0$-nak vesszük. A szignifikancia tesztelése minden esetben \emph{hipotézisvizsgálat}, a különbség a nullhipotézisek megfogalmazása között van, és az így különböző velejáró tesztstatisztika-eloszlásokban. 
+	
+	\section{t-teszt egyelemes paraméterrestrikcióra}
+	Láttuk, hogy $\ebeta$ elég közel lesz a normális eloszláshoz megfelelően sok megfigyelés mellett (mostantól mindig fix $\pmb{X}$-el dolgozunk). Azt is láttuk, hogy a hibavariancia torzítatlan becslése $\widehat{\sigma^2} = \frac{\pmb{e}^T\pmb{e}}{n-p}$ lesz (ugyan ezt nem bizonyítottuk de akit érdekel utánanézhet ha nagyon unatkozik).
+	\[
+		\ebeta \sim \mathcal{N}(\pmb{\beta}, \widehat{\sigma^2}(\pmb{X}^T\pmb{X})^{-1})
+	\]
+	Jelölje $(\pmb{X}^T\pmb{X})^{-1}$ inverz centralizálatlan (és normálatlan) regresszor-kovariancia mátrix $k$-adik diagonális elemét $\pmb{L}_{k}^2$, ez persze semmi más, mint a $0 \le k \le p$-adik paraméterbecslés varianciájának és a becsült magyarázatlan $\widehat{\sigma^2}$ hibavarianciának hányadosa. A null- és alternatív hipotéziseink:
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$H_0$ & $H_1$ \\
+			\hline
+			$\beta_k = 0$ & $\beta_k \ne 0$ \\
+			\hline
+		\end{tabular}
+	\end{center}
+	azaz hogy a nullhipotézis alatt a k-adik paraméterbecslésünk igazi értéke értéke $0$. A tesztstatisztikánk:
+	\[
+		t = \frac{\ebeta_k - 0}{\widehat{\sigma}\pmb{L}_{k}} = \frac{\ebeta_k}{\pmb{L}_k\sqrt{\frac{1}{n-p}\pmb{e}^T\pmb{e}}}
+	\]
+	Mivel $\pmb{y}$-ok normális eloszlásúak az $\pmb{X}\pmb{\beta}$ várható értékeik körül, ezért $\pmb{e}^T\pmb{e}$ normális eloszlású valószínűségi változó négyzetösszege, azaz $\chi^2$ eloszlású.
+	\\
+	\\
+	Még mielőtt továbbmennénk, lássuk be, hogy $\ebeta$ független $\pmb{e}^T\pmb{e}$-től.
+	\[
+		\ebeta = (\pmb{X}^T\pmb{X})^{-1}\pmb{X}^T\pmb{y}
+	\]
+	Ha $\pmb{e}$ tényleges hibát az $\pmb{X}\pmb{X}^{\dagger}$ oszloptér-vetítés mátrixxal írjuk föl, és meggondoljuk, hogy persze $\pmb{I} - \pmb{X}\pmb{X}^{\dagger}$ szintén vetítés mátrix, csak az $\pmb{X}$ oszlopterére ortogonális vektortérre:
+	\[
+		\pmb{e} = (\pmb{I} - \pmb{X}\pmb{X}^{\dagger})\pmb{y} = \pmb{y} - \pmb{X}\ebeta
+	\] 
+	ebből mátrixszorzásokkal és $\pmb{y}^T\pmb{y} = \sigma^2$-el megkaphatjuk $\ebeta^T\pmb{e}$-t:
+	\[
+		\ebeta^T\pmb{e} = \sigma^2(\pmb{X}^{\dagger} - (\pmb{X}^T\pmb{X})^{-1}\pmb{X}^T\pmb{X}\pmb{X}^{\dagger}) = \sigma^2\pmb{0} = 0
+	\]
+	Tehát a paraméterbecslésünk valóban független a hibáktól, ezért a tesztstatisztikánkban a $\chi^2$ és a $\mathcal{N}$ eloszlások függetlenek, azaz
+	\[
+		t = \frac{\ebeta_k - 0}{\widehat{\sigma}\pmb{L}_{k}} = \frac{\ebeta_k}{\pmb{L}_k\sqrt{\frac{1}{n-p}\pmb{e}^T\pmb{e}}} \sim t_{n-p}
+	\]
+	t-eloszlást követ, $n-p$ szabadságfokkal. A hipotézisvizsgálat szokásos módszertana szerint definiálunk egy $\alpha$ szignifikanciaszintet, és megnézzük, hogy $t$ beleesik-e az $\alpha$ által meghatározott elfogadási tartományba. Ha beleseik, nem tudjuk elutasítani $H_0$-t, azaz $\ebeta_k$-ról \emph{nem mondhatjuk, hogy nem $0$}. Ha kívül esik, akkor $\ebeta_k$ \emph{szignifikáns (szignifikánsan eltér $0$-tól) egy $\alpha$ szignifikancia szint mellett}.
+	
+	\section{F-teszt többszörös paraméterrestrikcióra}
+	Ha egyszerre több paraméter \emph{közös szignifikanciáját} szeretnénk vizsgálni (például az első $m+1$ paraméterét), akkor a hipotéziseink:
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$H_0$ & $H_1$ \\
+			\hline
+			$\beta_0 = \beta_1 = \dots = \beta_m = 0$ & $\beta_i \ne 0\quad \forall i = 0 \dots,m$ \\
+			\hline
+		\end{tabular}
+	\end{center}
+	Legyen $u$ az \emph{unrestricted}, avagy \emph{teljes} modellünk, ahol egyik paraméterünk sem $0$. Legyen $r$ a \emph{restricted}, avagy \emph{korlátozott} modellünk, ahol most speciálisan az első $m+1$ paraméterünk $0$ (ez a nullhipotézis melletti modell). Jelölje $SSR_u$ és $SSR_r$ rendre az ezen modellek melletti Sum of Squared Residualsokat, avagy hibanégyzetösszegeket. A tesztstatisztikánk
+	\[
+		F = \frac{\frac{SSR_r - SSR_u}{m+1}}{\frac{SSR_u}{n-p}}
+	\]
+	ahol $p$ a teljes modell magyarázó paramétereinek száma, $m+1 < p$ pedig a teljes és korlátozott modellek paraméterszámának különbsége. Gondoljuk meg, hogy a tesztstatisztika sosem lehet negatív, hiszen a teljes modell mellett mindig kisebb lesz a hibanégyzetösszeg (több paraméterrel biztosan jobban fogjuk tudni magyarázni a magyarázott változók varianciáját, kérdés persze, hogy \emph{nem magyarázzuk-e túl} azt).
+	$SSR_r - SSR_u$ és $SSR_u$ $\chi^2$ eloszlásúak, rendre $n-(p-(m+1))-(n-p) = n-p+m+1-n+p = m+1$ és $n-p$ szabadságfokokkal, tehát a tesztstatisztikánk \emph{F-eloszlást követ}:
+	
+	\[
+		F = \frac{\frac{SSR_r - SSR_u}{m+1}}{\frac{SSR_u}{n-p}} \sim F_{m+1,n-p}
+	\]
+	A t-teszttel analóg módon itt is megkeressük az ilyen paraméterezésű F-eloszlásból $\alpha$ szignifikancia szint mellett a kritikus értékeket, így az elfogadási tartományt is megtaláljuk, és ha $F$ beleesik ebbe, akkor nem tudjuk elvetni a nullhipotézist, azaz \emph{a korlátozott modell nem magyarázza $\pmb{y}$ varianciáját szignifikánsan rosszabban, mint a teljes modell}, így elhagyható a modellből az első $m+1$ magyarázó változó. Fontos kiemelni, hogy ebből csakis az első $m+1$ paraméter \emph{közös szignifikanciájára} következtethetünk, egyenként semmit nem tudunk meg róluk.
+	\subsection{Az F-teszt és a t-teszt ekvivalenciája}
+	Ha az F-tesztben pontosan egy $\beta$-t veszünk $0$-nak a nullhipotézis alatt, ez megegyezik az adott $\beta$-ra vonatkozó t-teszttel, mégpedig a tesztstatisztikákkal felírva:
+	\[
+		F_{1,n-p} = t^2_{n-p}
+	\]
 	
 \end{document}
