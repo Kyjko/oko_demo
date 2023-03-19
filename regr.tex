@@ -10,6 +10,11 @@
 \usepackage{xcolor}
 \usepackage{pgfplotstable}
 \usepackage{lmodern}
+\usepackage{tikz}
+\usepackage{titling}
+
+\setlength{\droptitle}{-40em}
+\pagestyle{headings}
 
 \usetikzlibrary{calc}
 
@@ -31,9 +36,61 @@
 
 \selectcolormodel{gray}
 
-\setcounter{chapter}{-1}
+\setcounter{chapter}{0}
 \renewcommand{\chaptername}{}
 \renewcommand{\thechapter}{}
+
+% coverlogo
+
+\newcounter{x}
+\newcounter{y}
+\newcounter{z}
+
+% The angles of x,y,z-axes
+\newcommand\xaxis{210}
+\newcommand\yaxis{-30}
+\newcommand\zaxis{90}
+
+% The top side of a cube
+\newcommand\topside[3]{
+	\fill[fill=yellow, draw=black,shift={(\xaxis:#1)},shift={(\yaxis:#2)},
+	shift={(\zaxis:#3)}] (0,0) -- (30:1) -- (0,1) --(150:1)--(0,0);
+}
+
+% The left side of a cube
+\newcommand\leftside[3]{
+	\fill[fill=cyan, draw=black,shift={(\xaxis:#1)},shift={(\yaxis:#2)},
+	shift={(\zaxis:#3)}] (0,0) -- (0,-1) -- (210:1) --(150:1)--(0,0);
+}
+
+% The right side of a cube
+\newcommand\rightside[3]{
+	\fill[fill=gray, draw=black,shift={(\xaxis:#1)},shift={(\yaxis:#2)},
+	shift={(\zaxis:#3)}] (0,0) -- (30:1) -- (-30:1) --(0,-1)--(0,0);
+}
+
+% The cube 
+\newcommand\cube[3]{
+	\topside{#1}{#2}{#3} \leftside{#1}{#2}{#3} \rightside{#1}{#2}{#3}
+}
+
+\newcommand\planepartition[1]{
+	\setcounter{x}{-1}
+	\foreach \a in {#1} {
+		\addtocounter{x}{1}
+		\setcounter{y}{-1}
+		\foreach \b in \a {
+			\addtocounter{y}{1}
+			\setcounter{z}{-1}
+			\foreach \c in {1,...,\b} {
+				\addtocounter{z}{1}
+				\cube{\value{x}}{\value{y}}{\value{z}}
+			}
+		}
+	}
+}
+
+%! coverlogo
 
 \makeatletter
 \pgfdeclareplotmark{dot}
@@ -43,7 +100,32 @@
 \makeatother
 
 \begin{document}
-	\maketitle
+	\thispagestyle{empty}
+	\vspace{30em}
+	\begingroup  
+	\centering
+	\textsc{\LARGE Lineáris regresszió elméleti összefoglaló}\\[2.5em]
+	\small{2023.03.19}\\
+	\large Bognár Miklós\par
+	\endgroup
+	\vspace{10em}
+	\begin{center}
+	\begin{tikzpicture}[scale=0.9]
+		%\planepartition{{5,5,5,5,5},{0},{3,3,3},{},{1}}
+		\draw[step=1cm,pink,very thin] (-1.9,-1.9) grid (5.9,5.9);
+		\draw[thick,->] (0,0) -- (5,0);
+		\draw[thick,->] (0,0) -- (0,5);
+		\draw[dashed,->] (0,1) -- (4,4);
+		\node at (1,3.5) [circle,fill,inner sep=1.5pt]{};
+		\node at (2,1.5) [circle,fill,inner sep=1.5pt]{};
+		\node at (3,4) [circle,fill,inner sep=1.5pt]{};
+		\node at (3.3,2) [circle,fill,inner sep=1.5pt]{};
+		\node at (2.1,3.2) [circle,fill,inner sep=1.5pt]{};
+		\node at (1.6,1.6) [circle,fill,inner sep=1.5pt]{};
+		\node at (1.8,1.8) [circle,fill,inner sep=1.5pt]{};
+	\end{tikzpicture}
+	\end{center}
+	
 	\tableofcontents
 	\vspace{2cm}
 	\emph{A *-al jelölt fejezetek/alfejezetek tudtommal nem képezik részét az anyagnak, azonban (szerintem) érdekesek, és segíthetnek jobban megérteni a lineáris regressziót.}
@@ -165,7 +247,7 @@
 		Cov[\xi_n,\xi_1] & Cov[\xi_n,\xi_2] & \dots & \sigma_n^2
 	\end{bmatrix}
 	\]
-	ahol $\sigma_1^2, \dots, \sigma_n^2$ rendre $\xi_1, \dots, \xi_n$ varianciái.
+	ahol $\sigma_1^2, \dots, \sigma_n^2$ rendre $\xi_1, \dots, \xi_n$ varianciái. 
 	
 	\section{Mátrixdifferenciálás nagyon röviden}
 	Legyenek $\pmb{a}, \pmb{b} \in \mathbb{R}^{k \times 1}$ vektorok. Ekkor
@@ -197,7 +279,7 @@
 	\[
 		d_M(\pmb{x}, \pmb{y}; F) := \sqrt{(\pmb{x} - \pmb{y})^T\pmb{\Sigma}^{-1}(\pmb{x} - \pmb{y})}
 	\]
-	\section{*Particionált négyzetes mátrixok}
+	\section{*Particionált mátrixok és a Blockwise formula}
 	Legyen $\pmb{A} \in \mathbb{R}^{n \times n}$ négyzetes invertálható mátrix. Particionáljuk $\pmb{A}$-t az alábbi módon:
 	\[
 		\pmb{A} =
@@ -214,7 +296,49 @@
 		-\pmb{A}_{22}^{-1}\pmb{A}_{21}(\pmb{A}_{11}-\pmb{A}_{12}\pmb{A}_{22}^{-1}\pmb{A}_{21})^{-1} & (\pmb{A}_{22}-\pmb{A}_{21}\pmb{A}_{11}^{-1}\pmb{A}_{12})^{-1}
 		\end{bmatrix}
 	\]
-	
+	A négyzetes mátrixokról az általános $n \times m$-es mátrixokra áttérve legyen $\pmb{X} \in \mathbb{R}^{n \times m}$ tetszőleges valós mátrix, $n > m$, és particionálja ezt horizontálisan $\pmb{Q}$ és $\pmb{R}$:
+	\[
+		\pmb{X} = \begin{bmatrix}
+				\pmb{Q} & \pmb{R}
+		\end{bmatrix}
+	\]
+	Ekkor $\pmb{X}\pmb{X}^{\dagger}$ oszloptér-vetítés mátrix a következőképpen írható fel:
+	\[
+		\pmb{X}\pmb{X}^{\dagger} = \pmb{Q}\pmb{Q}^{\dagger} + ((\pmb{I}-\pmb{Q}\pmb{Q}^{\dagger})\pmb{R})((\pmb{I}-\pmb{Q}\pmb{Q}^{\dagger})\pmb{R})^{\dagger}
+	\]
+	Ez az úgynevezett \emph{Blockwise formula}, avagy a blokkonkénti vetítés formula. Még mindig ennél a partíciónál maradva $\pmb{X}^{\dagger}$-t is megkaphatjuk a blokkokkal:
+	\[
+		\pmb{X}^{\dagger} = 
+		\begin{bmatrix}
+		\pmb{Q} & \pmb{R}
+		\end{bmatrix}^{\dagger} =
+	\begin{bmatrix}
+	\pmb{P}_{R}\pmb{Q}(\pmb{Q}^T\pmb{P}_{R}\pmb{Q})^{-1} \\
+	\pmb{P}_{Q}\pmb{R}(\pmb{R}^T\pmb{P}_{Q}\pmb{R})^{-1}
+	\end{bmatrix} = 
+	\begin{bmatrix}
+	(\pmb{P}_{R}\pmb{Q})^{\dagger} \\
+	(\pmb{P}_{Q}\pmb{R})^{\dagger}
+	\end{bmatrix}
+	\]
+	ahol $\pmb{P}_{Q}$ és $\pmb{P}_{R}$ rendre az ortogonális projekciómátrixok a $\pmb{Q}$ és $\pmb{R}$ mátrixok képterére ortogonális vektortérre:
+	\[
+		\pmb{P}_{Q} = \pmb{I} - \pmb{Q}(\pmb{Q}^T\pmb{Q})^{-1}\pmb{Q}^T = \pmb{I} - \pmb{Q}\pmb{Q}^{\dagger}
+	\]
+	\[
+		\pmb{P}_{R} = \pmb{I} - \pmb{R}(\pmb{R}^T\pmb{R})^{-1}\pmb{R}^T = \pmb{I} - \pmb{R}\pmb{R}^{\dagger}
+	\]
+	Tehát
+	\[
+		\begin{bmatrix}
+			\pmb{Q} & \pmb{R}
+		\end{bmatrix}^{\dagger} =
+		\begin{bmatrix}
+			((\pmb{I}-\pmb{R}\pmb{R}^{\dagger})\pmb{Q})^{\dagger} \\
+			((\pmb{I}-\pmb{Q}\pmb{Q}^{\dagger})\pmb{R})^{\dagger}
+		\end{bmatrix}
+	\]
+	Ezek a formulák akkor lehetnek hasznosak, ha a lineáris regresszió \emph{design mátrixát} particionáljuk bizonyos magyarázó változók szerint (például $\pmb{Q}$ lehet a csupa 1-ekből álló intercept oszlopmátrix), de ez már nagyon túlmutat a tárgy anyagán.  
 	
 	\chapter{A lineáris regresszió}
 	\section{A regressziós modell}
@@ -1133,5 +1257,87 @@
 	\[
 		F_{1,n-p} = t^2_{n-p}
 	\]
+	\chapter{A Maximum Likelihood Estimation (MLE)}
+	A lineáris regresszióbeli paraméterbecslésünk egy másik, elterjedt módja az úgynevezett $MLE$, avagy \emph{Maximum Likelihood Estimation} eljárás. A "likelihood" a megfigyelt adatok valószínűsége valamilyen paraméterek függvényében, az $MLE$ ezt a valószínűséget mint egy szélsőértékfeladatot maximalizálva találja meg azokat a paramétereket, amikkel ez a valószínűség a megfigyelt adatokon a lehető legnagyobb.
+	\\
+	\\
+	A lineáris regresszió modellünk továbbra is
+	\[
+		\pmb{y} = \pmb{X}\pmb{\beta} + \pmb{\e}
+	\]
+	Éljünk továbbra is azzal a feltétellel, hogy $\pmb{\e}$ normális eloszlású $0$ várható értékkel és $\sigma^2$ varianciával. Az $OLS$-ről szóló fejezetben megnéztük, hogy a modellről alkotott feltételeink mellett $\pmb{y}$ valószínűségi vektorváltozónk eloszlása
+	\[
+		\pmb{y} \mid \pmb{X} \sim \mathcal{N}(\pmb{X}\pmb{\beta}, \pmb{\Sigma})
+	\]
+	ahol $\pmb{\Sigma}$ diagonális, és minden diagonálisbeli elem azonosan $\sigma^2$, azaz nincs heteroszkedaszticitás. Írjuk fel annak a valószínűségét, hogy valamilyen $\ebeta$ és $\sigma^2$ paraméterek mellett az $i$-edik megfigyelt magyarázott változót kaptuk az $i$-edik megfigyelt magyarázóvektorból a modell mellett:
+	\[
+		\mathbb{P}(y_i \mid \pmb{x}_i, \ebeta, \sigma^2) = \frac{1}{\sigma\sqrt{2\pi}}exp \left(
+			-\frac{1}{2\sigma^2}(y_i - \ebeta^T\pmb{x}_i)^2
+		\right)
+	\] 
+	Mivel minden megfigyelésünk független, annak a valószínűsége tehát, hogy mind az $n$ darab $y_i$-t kaptuk:
+	\[
+		\mathbb{P}(\{y_i\}_{i=1}^{n} \mid \{\pmb{x}_i\}_{i=1}^{n}, \ebeta, \sigma^2) = \prod_{i=1}^{n}{
+		\frac{1}{\sigma\sqrt{2\pi}}exp \left(
+		-\frac{1}{2\sigma^2}(y_i - \ebeta^T\pmb{x}_i)^2
+		\right)	
+		}
+	\]
+	Valószínűségi vektorváltozókkal kompaktabban kiírva ugyanezt:
+	\[
+		\mathbb{P}(\pmb{y} \mid \pmb{X}, \ebeta, \sigma^2) = |\pmb{\Sigma}|^{-1/2}(2\pi)^{-n/2}exp\left(
+			-\frac{1}{2}(\pmb{y} - \pmb{X}\ebeta)^T\pmb{\Sigma}^{-1}(\pmb{y} - \pmb{X}\ebeta)
+		\right)
+	\]
+	Mivel $\pmb{\Sigma} = \sigma^2\pmb{I}$, így a fenti formula az alábbival egyenértékű:
+	\[
+		\mathbb{P}(\pmb{y} \mid \pmb{X}, \ebeta, \sigma^2) = (2\sigma^2\pi)^{-n/2}exp\left(
+			-\frac{1}{2\sigma^2}(\pmb{y} - \pmb{X}\ebeta)^T(\pmb{y} - \pmb{X}\ebeta)
+		\right)
+	\]
+	Ez a parametrizált feltételes valószínűség az $L(\ebeta, \sigma^2)$ \emph{likelihood függvény}, melynek logaritmusát véve $l(\ebeta, \sigma^2)$ \emph{log-likelihood függvényt} kapjuk.
+	\[
+		log(\mathbb{P}(\pmb{y} \mid \pmb{X}, \ebeta, \sigma^2)) =: l(\ebeta, \sigma^2)
+	\] 
+	Mostantól az argumentumok beírásának elhagyásával egyszerűen $L$ és $l$-ként fogunk hivatkozni erre.
+	
+	\section{A $\ebeta_{ML}$ és $\sigma^2_{ML}$ paraméterbecslések}
+	Az $MLE$ célja, hogy ezt az $L$ likelihood függvényt \emph{maximalizálja} $\ebeta$-ban és $\sigma^2$-ben. Ha feltesszük, hogy ismerjük $\sigma^2$-et, akkor természetesen a maximalizáció csak $\ebeta$-ban lesz. Mivel szorzatot nehéz differenciálni, és mivel a $log$ függvény szigorúan monoton nő, így az $L$ függvény maximalizálása helyett $l$-et fogjuk maximalizálni. $l$ alakja
+	\[
+		l = -\frac{n}{2}log(2\sigma^2\pi) - \frac{1}{2\sigma^2}(\pmb{y} - \pmb{X}\ebeta)^T(\pmb{y} - \pmb{X}\ebeta)
+	\]
+	Tegyük fel, hogy ismerjük $\sigma^2$-et. Formálisan felírva $\ebeta$-t megkaphatjuk az alábbi módon (az összeg első első tagja most konstans):
+	\[
+		\ebeta_{ML} = \underset{\ebeta}{argmax}\left(
+			-\frac{1}{2\sigma^2}(\pmb{y} - \pmb{X}\ebeta)^T(\pmb{y} - \pmb{X}\ebeta)
+		\right)
+	\]
+	Mivel a konstans szorzó nem befolyásolja a szélsőérték feladat optimális megoldását, így a mínusz előjelet elhagyva és minimalizációs problémára átírva:
+	\[
+		\ebeta_{ML} = \underset{\ebeta}{argmin}\left(
+			(\pmb{y} - \pmb{X}\ebeta)^T(\pmb{y} - \pmb{X}\ebeta)
+		\right)
+	\]
+	Ha összehasonlítjuk ezt az $OLS$ becslés szélsőérték feladatával, látjuk, hogy \emph{pontosan ugyanazt kaptuk} (csak ott $\pmb{e}^T\pmb{e}$-el volt felírva). Kimondhatjuk tehát, hogy \emph{ha normális eloszlású hibát feltételezünk a lineáris regressziós modellben, és ezen kívül minden egyéb feltétel szintén teljesül, akkor az $MLE$ becslés eredményének ugyanazt kapjuk, mint az $OLS$ becslés eredménye, $\ebeta_{ML} = \ebeta_{OLS}$}.
+	\\
+	\\
+	A Maximum Likelihood becslés azonban nem csak $\ebeta$ becslését tudja megadni, hanem $\sigma^2$-ét is! Ha most megfordítjuk a helyzetet, és feltesszük, hogy már ismerjük $\ebeta_{ML}$-t, akkor a fenti szélsőértékfeladat már $\sigma^2$-ről szól:
+	\[
+		\sigma^2_{ML} = \underset{\sigma}{argmax}\left(
+		-\frac{n}{2}log(2\sigma^2\pi) - \frac{1}{2\sigma^2}(\pmb{y} - \pmb{X}\ebeta_{ML})^T(\pmb{y} - \pmb{X}\ebeta_{ML})
+		\right)
+	\]
+	Ezt megoldva kapjuk $\sigma^2$ $MLE$ becslését:
+	\[
+		\sigma^2_{ML} = \frac{1}{n}(\pmb{y} - \pmb{X}\ebeta_{ML})^T(\pmb{y} - \pmb{X}\ebeta_{ML})
+	\]
+	Ez persze semmi más, mint
+	\[
+		\sigma^2_{ML} = \frac{1}{n}\pmb{e}^T\pmb{e}
+	\]
+	ahol $\pmb{e}$-k a $\ebeta_{ML}$-el becsült $\hat{y}_i$-k és a tényleges $y_i$-k hibavektora. A hibanormalitási és az egyéb feltételek mellett tehát az $MLE$ becslés az $OLS$-el együtt $BLUE$. Fontos, hogy a Maximum Likelihood Estimation technika nem csak regressziós modellek esetén alkalmazható, ezért is különösen fontos nekünk a hibanormalitás. 
+	\\
+	\\
+	Ha nem tesszük fel $\pmb{y}$ normális eloszlását, akkor az $MLE$ becslés  \emph{hatásosabb} az OLS-nél, és numerikus kiszámítása is stabilabb (nem kell magas dimenziójú mátrixokat invertálgatnunk - multikollinearitás esetén láttuk, hogy az $OLS$ becslés kiszámítása ott problémákba tud ütközni. Összességében tehát a feltételeink mellett (a hibanormalitást és $\pmb{y}$ normális eloszlását is hozzávéve persze) kijelenthető, hogy a kettő megegyezik.
 	
 \end{document}
