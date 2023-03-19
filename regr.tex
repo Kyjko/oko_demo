@@ -134,7 +134,7 @@
 	A lineáris regresszió megértéséhez elengedhetetlen, hogy tisztában legyünk néhány, lineáris algebrából ismeretes fogalommal és összefüggéssel. Ezen felül nagyon hasznos, ha ismerjük, hogy hogyan kezelendőek a valószínűségi vektorváltozók illetve a mártixdifferenciálás-kifejezések.  
 	
 	\section{Pszeudoinverzek}
-	Legyen $\pmb{A} \in \mathbb{R}^{n\times m}, n \ne m$ nem négyzetes mátrix. Ha egy  $\pmb{A}x = y , x \in \mathbb{R}^{m\times 1}, y \in \mathbb{R}^{n \times 1}$ lineáris egyenletrendszer együtthatómátrixaként gondolunk rá, akkor $n \ge m$ vagy $m \ge n$ esetén rendre a \emph{túlhatározottság} vagy \emph{alulhatározottság} esete állna fent, az első esetben általánosságban nem lenne megoldásunk, a második esetben pedig végtelen sok megoldásunk lenne rá. Látszik, hogy az $n \ne m$ esetben nem beszélhetünk $\pmb{A}^{-1}$ inverzről, helyette egy általánosabb, úgynevezett \emph{pszeudoinverz} kell.
+	Legyen $\pmb{A} \in \mathbb{R}^{n\times m}, n \ne m$ nem négyzetes mátrix. Ha egy  $\pmb{A}x = y , x \in \mathbb{R}^{m\times 1}, y \in \mathbb{R}^{n \times 1}$ lineáris egyenletrendszer együtthatómátrixaként gondolunk rá, akkor $n > m$ vagy $m > n$ esetén rendre a \emph{túlhatározottság} vagy \emph{alulhatározottság} esete állna fent, az első esetben általánosságban nem lenne megoldásunk, a második esetben pedig végtelen sok megoldásunk lenne rá. Látszik, hogy az $n \ne m$ esetben nem beszélhetünk $\pmb{A}^{-1}$ inverzről, helyette egy általánosabb, úgynevezett \emph{pszeudoinverz} kell.
 	\\
 	\\
 	Egy $\pmb{A} \in \mathbb{R}^{n \times m}, n > m$ mátrix \emph{bal oldali pszeudoinverze} (Más néven \emph{Moore-Penrose pszeudoinverz}):
