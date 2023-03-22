@@ -208,7 +208,7 @@
 	\[
 	\pmb{\xi} \sim \mathcal{N}(\pmb{\mu}, \pmb{\Sigma})
 	\]
-	ahol $\pmb{\mu} \in \mathbb{R}^{n \times 1}$ a várható értékek vektora, $\pmb{\Sigma}$ pedig a \emph{variancia-kovarianca mátrix}. Természetesen $Var[\pmb{\xi}] = \pmb{\Sigma}$. Természetesen $\pmb{\Sigma} \in \mathbb{R}^{n \times n}$ pozitív szemidefinit és szimmetrikus mártix. Az $n = 1$ esettel analóg módon $\pmb{\xi}$ sűrűségfüggvénye
+	ahol $\pmb{\mu} \in \mathbb{R}^{n \times 1}$ a várható értékek vektora, $\pmb{\Sigma}$ pedig a \emph{variancia-kovarianca mátrix}. Természetesen $Var[\pmb{\xi}] = \pmb{\Sigma}$. Természetesen $\pmb{\Sigma} \in \mathbb{R}^{n \times n}$ pozitív szemidefinit és szimmetrikus mártix. Az $n = 1$ esettel analóg módon $\pmb{\xi}$ sűrűségfüggvénye ($\xi_i$-k most konkrét értékek)
 	\[
 	f_{\pmb{\xi}}(\xi_1, \dots, \xi_n) = \frac{ e^{-\frac{1}{2}(\pmb{\xi}-\pmb{\mu})^T\pmb{\Sigma}^{-1}(\pmb{\xi}-\pmb{\mu})}}{\sqrt{(2\pi)^n|\pmb{\Sigma}|}}
 	\]
@@ -736,6 +736,17 @@
 		\ebeta \mid \pmb{X} \underset{n \rightarrow \infty}{\sim} \mathcal{N}((\pmb{X}^T\pmb{X})^{-1}\pmb{X}^T\pmb{X}\pmb{\beta}, \sigma^2(\pmb{X}^T\pmb{X})^{-1}\pmb{X}^T\pmb{X}(\pmb{X}^T\pmb{X})^{-1}) \sim \mathcal{N}(\pmb{\beta}, \sigma^2(\pmb{X}^T\pmb{X})^{-1})
 	\] 
 	azaz $\ebeta$ valóban normális eloszlást követ, a már jól ismert $\sigma^2(\pmb{X}^T\pmb{X})^{-1}$ varianciával és a valódi $\pmb{\beta}$ várható értékkel. Persze ez az $\ebeta$ \emph{vektorra} vonatkozott, és csak \emph{aszimptotikusan igaz}, azaz ha $n \rightarrow \infty$, hiszen ekkor a \emph{centrális határeloszlás tétel} értelmében a regresszorokból összetett mátrixkifejezés maga is normális lesz. Mi nyilván nem tudunk végtelen sok mintavétellel dolgozni, tehát azt mondjuk, hogy ha \emph{elég nagy $n$}, akkor a paraméterbecslés nagyon jól megközelíti a normális eloszlást.
+	\\
+	\\
+	Gyakran $\ebeta$ aszimptotikus viselkedésére mint \emph{konzisztencia} utalnak, ez annyit jelent, hogy az eloszlás aszimptotikusan "ráhúzódik" a $\pmb{\beta}$ várható értékű normális eloszlásra. Formálisan felírva
+	\[
+		\ebeta \overset{p}{\rightarrow} \pmb{\beta} 
+	\]
+	\[
+		\mathbb{P}(|\ebeta_i - \pmb{\beta}_i| < \varepsilon) > 1 - \delta, \quad \forall i, \quad \varepsilon, \delta > 0
+	\]
+	ahol $\overset{p}{\rightarrow}$ a \emph{probability limit}.
+	Fontos, hogy a konzisztencia \emph{nem} vonja maga után a torzítatlanságot, hiszen gondoljuk meg, hogy ha $\frac{1}{n}$-et adunk egy torzítatlan konzisztens becsléshez, akkor a becslés továbbra is konzisztens marad, azonban már torzított lesz.
 	\\
 	\\
 	$\ebeta$ \emph{feltétel nélküli varianciáját} az alábbi módon kaphatjuk meg:
@@ -1329,13 +1340,20 @@
 	\]
 	Ezt megoldva kapjuk $\sigma^2$ $MLE$ becslését:
 	\[
-		\sigma^2_{ML} = \frac{1}{n}(\pmb{y} - \pmb{X}\ebeta_{ML})^T(\pmb{y} - \pmb{X}\ebeta_{ML})
+		\widehat{\sigma^2}_{ML} = \frac{1}{n}(\pmb{y} - \pmb{X}\ebeta_{ML})^T(\pmb{y} - \pmb{X}\ebeta_{ML})
 	\]
 	Ez persze semmi más, mint
 	\[
-		\sigma^2_{ML} = \frac{1}{n}\pmb{e}^T\pmb{e}
+		\widehat{\sigma^2}_{ML} = \frac{1}{n}\pmb{e}^T\pmb{e}
 	\]
-	ahol $\pmb{e}$-k a $\ebeta_{ML}$-el becsült $\hat{y}_i$-k és a tényleges $y_i$-k hibavektora. A hibanormalitási és az egyéb feltételek mellett tehát az $MLE$ becslés az $OLS$-el együtt $BLUE$. Fontos, hogy a Maximum Likelihood Estimation technika nem csak regressziós modellek esetén alkalmazható, ezért is különösen fontos nekünk a hibanormalitás. 
+	ahol $\pmb{e}$-k a $\ebeta_{ML}$-el becsült $\hat{y}_i$-k és a tényleges $y_i$-k hibavektora. Felmerülhet a kérdés, hogy miért $n$-el, és nem $n-1$-el osztjuk le $\pmb{e}^T\pmb{e}$-t a varianciabecslésnél, mint eddig. Az $n$-el való leosztás valóban nem eredményez torzítatlan varianciabecslést, azonban emlékezzünk vissza a \emph{Mean Squared Error (MSE)} definíciójára, most $\widehat{\sigma^2}_{ML}$-re nézve:
+	\[
+		MSE = \frac{\sum_{i=1}^{n}{(\widehat{\sigma^2}_{ML} - \sigma^2)^2}}{n}
+	\]
+	Ha $n-1$-el osztottunk volna le, ugyan torzítatlan becslésünk lenne, de \emph{az $MSE$ nagyobb lenne}. Mivel $MSE = Bias^2 + Var$, így ugyan csökkentettük $Bias^2$-et (így persze $Bias$-t is), de ezzel \emph{növeltük} a becslés varianciáját. Az, hogy melyik a jobb vagy rosszabb, nagyon függ attól a becslési feladat kontextusától, és általánosan nem is könnyű az, hogy "melyik rossz a kevésbé rossz".  
+	\\
+	\\
+	A hibanormalitási és az egyéb feltételek mellett tehát az $MLE$ becslés az $OLS$-el együtt $BLUE$. Fontos, hogy a Maximum Likelihood Estimation technika nem csak regressziós modellek esetén alkalmazható, ezért is különösen fontos nekünk a hibanormalitás. 
 	\\
 	\\
 	Ha nem tesszük fel $\pmb{y}$ normális eloszlását, akkor az $MLE$ becslés  \emph{hatásosabb} az OLS-nél, és numerikus kiszámítása is stabilabb (nem kell magas dimenziójú mátrixokat invertálgatnunk - multikollinearitás esetén láttuk, hogy az $OLS$ becslés kiszámítása ott problémákba tud ütközni. Összességében tehát a feltételeink mellett (a hibanormalitást és $\pmb{y}$ normális eloszlását is hozzávéve persze) kijelenthető, hogy a kettő megegyezik.
