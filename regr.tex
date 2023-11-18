@@ -1358,4 +1358,138 @@
 	\\
 	Ha nem tesszük fel $\pmb{y}$ normális eloszlását, akkor az $MLE$ becslés  \emph{hatásosabb} az OLS-nél, és numerikus kiszámítása is stabilabb (nem kell magas dimenziójú mátrixokat invertálgatnunk - multikollinearitás esetén láttuk, hogy az $OLS$ becslés kiszámítása ott problémákba tud ütközni. Összességében tehát a feltételeink mellett (a hibanormalitást és $\pmb{y}$ normális eloszlását is hozzávéve persze) kijelenthető, hogy a kettő megegyezik.
 	
+	\subsection{Fisher-információ}
+	Az MLE-becslés \emph{bizonytalansága} a \emph{Fisher információval} fejezhető ki. Formálisan a Fisher információ azt az információmennyiséget adja meg, amennyit a megfigyelt $\pmb{X}$ adat az ismeretlen $\theta \in \Theta$ paraméterről \emph{elárul} a megfigyelést követően. A következőkben jelölje $f(\pmb{X}; \theta)$ $\pmb{X}$ megfigyelésének valószínűségét $\theta$ mellett.
+	Definiáljuk a \emph{log-likelihood function} $\theta$ szerinti parciális deriváltját
+	\[
+		s(\pmb{X};\theta) = \frac{\partial}{\partial \theta}log f(\pmb{X};\theta),
+	\]
+	ezt \emph{score-function}nek hívjuk. Könnyen belátható, hogy ha feltesszük, hogy $\pmb{X}$ valóban $f(\pmb{X};\theta)$ eloszlást követ, akkor az igazi $\theta$ paraméter mellett vett várható értéke a scorenak pontosan $0$:
+	\[
+		\mathbb{E}\Big[ s(\pmb{X};\theta)\rvert \theta \Big] = \int_{\mathbb{R}}{\frac{\frac{\partial}{\partial \theta}f(x; \theta)}{f(x;\theta)}f(x; \theta)dx} = \frac{\partial}{\partial \theta}\int_{\mathbb{R}}{f(x; \theta)dx} = \frac{\partial}{\partial \theta} 1 = 0
+	\]
+	A Fisher információ a score function varianciája, formálisan
+	\[
+		\mathcal{I}(\theta) = Var[s(\pmb{X};\theta)]
+	\]
+	Előbb beláttuk, hogy $\mathbb{E}[s(\pmb{X};\theta)\rvert \theta] = 0$, így - mostantól egyszerűsített jelölésekkel - $\mathbb{E}[s_\theta]^2 = 0$ is fennáll. Ezek szerint tehát
+	\[
+		\mathcal{I}_\theta = \mathbb{E}[s_\theta^2] - \mathbb{E}[s_\theta]^2 = \mathbb{E}[s_\theta^2]
+	\]
+	Tudjuk, hogy
+	\[
+		\frac{\partial^2}{\partial \theta^2}log f_\theta = \frac{\frac{\partial^2}{\partial \theta^2} f_\theta}{f_\theta} - \Big( \frac{\frac{\partial}{\partial \theta}f_\theta}{f_\theta} \Big) = \frac{\frac{\partial^2}{\partial \theta^2}f_\theta}{f_\theta} - \Big(\frac{\partial}{\partial \theta} log f_\theta\Big)^2
+	\]
+	Mindkét oldalon várhatóértéket véve, és megfigyelve, hogy $\mathbb{E}\Big[ \frac{\frac{\partial^2}{\partial \theta^2} f_\theta}{f_\theta} \rvert \theta\Big] = \frac{\partial^2}{\partial \theta^2}\int_{\mathbb{R}}{f_\theta(x) dx} = 0$,
+	\[
+		\mathbb{E}\Big[ \frac{\partial^2}{\partial \theta^2} log f_\theta\Big] = -\mathbb{E}\Big[ \Big(\frac{\partial}{\partial \theta} log f_\theta \Big)^2\Big]
+	\]
+	Megfordítva az előjeleket, és az elsőrendű parciális derivált helyére $s_\theta$-t írva adódik, hogy
+	\[
+		\mathcal{I}_\theta = \mathbb{E}[s^2_\theta] = -\mathbb{E}\Big[ \frac{\partial^2}{\partial \theta^2} log f_\theta \rvert \theta \Big]
+	\]
+	Intuitíven ez azt jelenti, hogy \emph{minél gyorsabban változik a meredeksége a log-likelihood functionnek} egy adott $\theta$ mellett, annál nagyobb bizonyossággal írja le a megfigyelt adatokat $\theta$. Ha ez az érték kicsi, akkor a log-likelihood function alakja lapos. Fontos megjegyezni, hogy mivel $\mathbb{E}[s\rvert \theta] = 0$, így a log-likelihood maximuma nyilván a valódi $\theta$ paraméter mellett lesz, a görbület e körül a valódi érték körül értendő. A negatív előjel a likelihood függvény konkavitása miatt kell, hiszen a második derivált negativitása miatt nem akarunk negatív információt definiálni. Természetesen itt $\theta \in \Theta$-ra mint tetszőleges elemszámú (lehetőleg véges) paramétervektor tekinthetünk , így az aszerinti másodrendű parciális derivált egy \emph{Hesse-mátrix}ot fog adni. Intuitíven az is következik tehát, hogy ez a mátrix pontosan az MLE-becslés \emph{variancia-kovariancia mátrixát} fogja megadni. 
+	\chapter{Általánosabb lineáris modellek és kvalitatív változók}
+	Az előző fejezetekben csupán a lineáris $y_i = \pmb{\beta}^{T}\pmb{x}_i$ modellekkel foglalkoztunk, azonban a gyakorlatban nagyon sokszor nem elég ez a szimplisztikus megközelítés. Ebben a fejezetben bevezetjük a \emph{polinomiális regresszió} fogalmát, majd ennek segítségével a bonyolultabb modellek reprezentációját.
+	
+	\section{A "feature transform" függvény - $\phi$}
+	Ahhoz, hogy elrugaszkodjunk a lineáris modellek egyszerűségétől, először is be kell vezetni az úgynevezett \emph{feature transform} (magyarázó változó-transzformáló) függvényt, melyre ezentúl $\phi$ néven hivatkozunk. Legyen $p \in \mathbb{N}$ az eredeti magyarázó változók száma. Azt mondjuk, hogy a 
+	\[
+		\phi : \mathbb{R}^{p} \mapsto \mathbb{R}^{D}, \quad D \in \bar{\mathbb{R}}, D > p 
+	\]
+	függvény minden magyarázó változó-vektort egy \emph{magasabb dimenziójú térbe ágyaz be}. Nézzünk egy konkrét példát:
+	\\
+	\\
+	Legyen $\pmb{x}_i \in \mathbb{R}^{2}$ magyarázó változó-vektora az $i$-edik megfigyelésnek. Jelöljük a vektor elemeit az alábbi módon:
+	\[
+		\pmb{x}_i =
+		\begin{bmatrix}
+			x_1 \\
+			x_2
+		\end{bmatrix}	
+	\]
+	Most vegyünk egy $\phi$ transzformációt, melyet definiáljunk a következőképpen:
+	\[
+		\phi\left(
+		\begin{bmatrix}
+			x_1 \\
+			x_2
+		\end{bmatrix}	
+		\right) := 
+		\begin{bmatrix}
+			x_1 \\
+			x_2 \\
+			x^2_1 \\
+			x^2_2 \\
+			x_1 x_2 \\
+		\end{bmatrix}
+	\]
+	Ebben az esetben $\phi$ kettő dimenziós vektorokból 5 dimenziójúakat csinál, mégpedig úgy, hogy az új, magasabb dimenziós vektor elemei \emph{lineárisan függetlenek} (Gondoljuk meg, hogy $x_1 + x_2 + x^2_1 + x^2_2 + x_1 x_2 = 0$ akkor és csak akkor, ha minden elem pontosan $0$. Ellenpéldaként például ha $[x_1, x_2]^T \mapsto [x_1, x_2, 2x_1, 2x_2]^T$ lenne $\phi$, akkor ez lineárisan összefüggő elemeket eredményez, \emph{nem kaptunk igazi új magyarázó változókat}. Fontos megjegyezni, hogy elméletben semmi nem akadályoz meg minket végtelen dimenziós featurevektorokat kapjunk $\phi$ által, persze a gyakorlatban ez nem megvalósítható.
+	\\
+	\\
+	$\pmb{X}$ design-mátrix soraiban most $\pmb{x}_i$-k helyett tehát $\phi(\pmb{x}_i)$-k lesznek, így ha az új design mátrixot $\pmb{\Phi}$-vel jelöljük:
+	\[
+		\pmb{\Phi} = 
+		\begin{bmatrix}
+			 - & \phi(\pmb{x}_1) & - \\
+			 - & \phi(\pmb{x}_2) & - \\
+			 \vdots & \vdots & \vdots \\
+			 - & \phi(\pmb{x}_n) & -
+		\end{bmatrix}
+	\]
+	$\pmb{\Phi}$ a gyakorlatban sokszor \emph{lényegesen} nagyobb dimenziójú, mint $\pmb{X}$, így az ezzel való mátrixoperációk is szignifikánsan lassabbak lesznek. A probléma megoldásához úgynevezett \emph{kernelizáció} szükséges, de ezzel nem fogunk foglalkozni részletesen.
+	 
+	\subsection{A polinomiális regresszió}
+	A $\phi$ transzformáció egy speciális esetében polinomiális regresszióról beszélünk. Legyen $m \in \mathbb{R}$ maximális polinomfokszám és az eredeti magyarázó változó-vektor dimenziója $1$. $\pmb{\Phi}$ alakja ekkor
+	\[
+		\pmb{\Phi} =
+		\begin{bmatrix}
+		1 & x_1 & x_1^2 & \dots & x_1^m \\
+		1 & x_2 & x_2^2 & \dots & x_2^m \\
+		\vdots & \vdots & \vdots & \ddots & \vdots \\
+		1 & x_n & x_n^2 & \dots & x_n^m
+		\end{bmatrix}
+	\]
+	Az ilyen $\pmb{\Phi}$ transzformált design-mátrixot \emph{polinomiális design-mátrixnak} nevezünk, és ez szolgál alapul a polinomiális regresszióhoz. A regressziós modellünk tehát az alábbi formában írható fel ilyenkor:
+	\[
+		y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \dots + \beta_m x_i^m
+	\]
+	
+	\section{Interakciós változók}
+	Emlékezzünk vissza a design-mátrix egy $\phi$ feature-transformmal kibővített általános formájára, ahol is egy adott $\pmb{x} \in \mathbb{R}^m$ featurevektor egy magasabb $D > m$ dimenziós featurevektorrá válik. A design mátrixunkat ilyenkor $\pmb{\Phi}$-al jelöljük. A különbség a polinomális regresszió és az interakciós változós regresszió között csupán annyi, hogy míg a polinomiális esetben $\pmb{\Phi}$ nem tartalmazott különböző featureök kombinációjából álló új feature-t, az interakciós változóknak ellenben pontosan ez a lényege, a szorzat-tagok a különböző featureök közti interakciót jelentik. Legyen példának okáért az eredeti $\pmb{x}$ featurevektorunk 2-dimenziós, rendre $x_1$ és $x_2$ featureökkel. Ekkor egy interakciós változókat tartalmazó design-mátrix lehetséges alakja:
+	\[
+		\pmb{\Phi} =
+		\begin{bmatrix}
+		1 & x_{11} & x_{12} & x_{11} x_{12} \\
+		1 & x_{21} & x_{22} & x_{21} x_{22} \\
+		1 & x_{31} & x_{32} & x_{31} x_{32} \\
+		\vdots & \vdots & \vdots & \vdots \\ 
+		1 & x_{N1} & x_{N2} & x_{N1} x_{N2}
+		\end{bmatrix}		
+	\]
+	Az interakciós változók lehetővé teszik lineáris kapcsolatok modellezését különböző intercept és meredekségekkel. Ezt legkönnyebben egy konkrét példával érthetjük meg. Fontos kihangsúlyozni, hogy csakúgy mint eddig, semmi nem akadályoz meg minket kvalitatív (diszkrét értékeket felvevő) magyarázó változók (featureök) használatában, mint azt látni fogjuk, a velük történő interakcióknak is hasznos értelmezése lesz.
+	\\
+	\\
+	Tekintsük az alábbi modellezési feladatot: Legyen $LE$ a \emph{life expectancy at birth}, amit $COUNTRY$,\\
+	 $RADIATION$, $GDP$ és $SUN$ (human-developement index) magyaráznak (a példa relatíve morbid, ettől most tekintsünk el). $GDP$ és $SUN$ mint folytonos változók, a többi mint diszkrétek vannak kezelve, a $RADIATION$ bináris (2-értékű) változó, míg a $SUN$ a napsütés erősségét jelenti. Feltesszük, hogy a magyarázó változók lineárisan függetlenek egymástól, valamennyi korreláció persze előfordulhat, de most ettől eltekintünk. Az interakciók nélküli egyszerű lineáris modellünket a következőképpen írhatjuk fel:
+	\[
+		LE_i = \beta_0 + \beta_1 COUNTRY_i + \beta_2 RADIATION_i + \beta_3 GDP_i + \beta_4 SUN_i
+	\]
+	Most vezessük be a $RADIATION$ és a $SUN$ interakcióját, melyet $RADIATION*SUN$-al jelölünk:
+	\[
+		LE_i = \beta_0 + \beta_1 COUNTRY_i + \beta_2 RADIATION_i + \beta_3 GDP_i + \beta_4 SUN_i + \beta_5 RADIATION_i * SUN_i
+	\]
+	Ez annyit jelent, hogy azoknál az előrejelzéseknél, ahol $RADIATION = 1$, ott a $SUN$ együtthatója nem csupán $\beta_4$, hanem $\beta_4 + \beta_5$ lesz, azaz \emph{az interakciós változókkal bővített modellben előfordulhat különböző meredekség kvalitatív és kvantitatív interakciós változók bevezetése mellett}. Bővítsük a modellünket a $COUNTRY * RADIATION$ interakcióval, ekkor a modell
+	\[
+		LE_i = \beta_0 + \beta_1 COUNTRY_i + \beta_2 RADIATION_i + \beta_3 GDP_i + \beta_4 SUN_i + \beta_5 RADIATION_i * SUN_i + 
+	\]
+	\[
+		+ \beta_6 COUNTRY_i * RADIATION_i
+	\]
+	Mivel az új interakció mindkét tagja kvalitatív (diszkrét), így ha egy előrejelzésnél $RADIATION = 1$, $COUNTRY$ együtthatója $\beta_1 + \beta_6$ lesz, azaz ha az x-tengelyen a $SUN$-t mint magyarázó változót képzeljük el, akkor az \emph{intercept} $\beta_0 + \beta_1 COUNTRY$-ról $\beta_0 + (\beta_1 + \beta_6) COUNTRY$-ra változott. Kimondhatjuk tehát, hogy ebben az egyszerű esetben míg egy diszkrét és egy folytonos magyarázó változó interakciója a meredekséget, kettő diszkrét változó interakciója az interceptet engedi változtatni, ami a modellben különböző interceptű és meredekségű lineáris kapcsolatokat eredményez, ezzel egyfajta flexibilitást nyújtva a modellezőnek (nekünk).
+	\\
+	\\
+	Természetesen semmi nem akadályoz meg minket abban, hogy egyszerre több változó interakcióját is beletegyük a modellben, habár ennek intuitív értelmezése egy kicsit nehezebb, ezért ezzel a továbbiakban nem fogunk mélyebben foglalkozni. Természetesen - mint azt a feature-transformoknál láttuk - különböző változók interakciói szükségképpen lineárisan függetlenek lesznek egymástól (gondoljunk itt például az $x_1*x_2$, $x_1*x_3$, $x_2*x_3$, $x_1*x_2*x_3$ esetére, aholis ezek mind lineárisan függetlenek egymástól).
+	
+	
 \end{document}
